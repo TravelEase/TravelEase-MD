@@ -13,6 +13,40 @@
         android:theme="@style/Theme.TravelEase"
         tools:targetApi="31">
         <activity
+            android:name=".SavedActivity"
+            android:exported="false"
+            android:label="@string/title_activity_saved" />
+        <activity
+            android:name=".EditItineraryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SavedItineraryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DetailDestinationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ContinueCreateItineraryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateItineraryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SplashScreenActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
