@@ -4,4 +4,27 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="welcome_to_travel_ease">WELCOME TO TRAVEL EASE</string>
+    <string name="landing_text">Discover the future of hassle-free travel planning with TravelEase, your all-in-one trip companion, providing personalized itineraries and destination recommendations. Revolutionize your travel experience and make every journey unforgettable with TravelEase!</string>
+    <string name="signup">Daftar</string>
+    <string name="login">Masuk</string>
+    <string name="message_welcome_page">Percobaan submission intermediete upload story. Bismillah semangat!</string>
+    <string name="title_welcome_page">Selamat datang di SubIntermediete!</string>
+    <string name="title_signup_page">Lengkapi data diri di bawah ini</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="message_login_page">Silakan memasukkan email dan password</string>
+    <string name="title_login_page">Login</string>
+    <string name="name">Nama</string>
+    <string name="message_main_page">Selamat Belajar di Dicoding.</string>
+    <string name="greeting">Halo %1$s,</string>
+    <string name="logout">Keluar</string>
+    <string name="nama_user">Nama User</string>
+    <string name="description">description</string>
+    <string name="empty_image">Image kosong, isi dulu</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="register">Register</string>
+    <string name="saved">Saved</string>
+    <string name="create">Create</string>
+    <string name="profile">Profile</string>
 </resources>

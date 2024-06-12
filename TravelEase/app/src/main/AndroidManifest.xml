@@ -17,37 +17,25 @@
             android:exported="false"
             android:label="@string/title_activity_saved" />
         <activity
-            android:name=".EditItineraryActivity"
+            android:name=".ui.saved.EditItineraryActivity"
             android:exported="false" />
         <activity
-            android:name=".SavedItineraryActivity"
+            android:name=".ui.detail.DetailDestinationActivity"
             android:exported="false" />
         <activity
-            android:name=".ProfileActivity"
+            android:name=".ui.create.ContinueCreateItineraryActivity"
             android:exported="false" />
         <activity
-            android:name=".DetailDestinationActivity"
+            android:name=".ui.register.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".ContinueCreateItineraryActivity"
+            android:name=".ui.login.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".CreateItineraryActivity"
+            android:name=".ui.welcome.WelcomeActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".WelcomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SplashScreenActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
+            android:name=".ui.splashscreen.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -55,6 +43,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>
