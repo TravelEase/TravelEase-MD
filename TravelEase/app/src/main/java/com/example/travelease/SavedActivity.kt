@@ -15,9 +15,14 @@ class SavedActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivitySavedBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Set Toolbar sebagai ActionBar
+        setSupportActionBar(binding.toolbar)
+
+        // Optional: Tambahkan navigasi ke Toolbar jika diperlukan
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val navView: BottomNavigationView = binding.navView
 
