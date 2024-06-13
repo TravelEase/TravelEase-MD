@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.travelease.R
 import com.example.travelease.databinding.ActivityContinueCreateItineraryBinding
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ContinueCreateItineraryActivity : AppCompatActivity() {
 
@@ -15,8 +17,19 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         binding = ActivityContinueCreateItineraryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Get data from intent
+        val categories = intent.getStringArrayListExtra(CreateFragment.EXTRA_CATEGORY) ?: arrayListOf()
+        val city = intent.getStringExtra(CreateFragment.EXTRA_CITY)
+        val numberOfPeople = intent.getIntExtra(CreateFragment.EXTRA_NUMBER_OF_PEOPLE, 1)
+        val dates = intent.getStringExtra(CreateFragment.EXTRA_DATES)
+
+        // Set data to TextViews
+        binding.tvCategory.text = categories.joinToString(", ")
+        binding.tvCity.text = city
+        binding.tvNumberOfPeople.text = "Number of people: $numberOfPeople"
+
         setupRecommendationRecyclerView()
-        setupExpandableListView()
+        setupExpandableListView(dates)
     }
 
     private fun setupRecommendationRecyclerView() {
@@ -31,22 +44,42 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         binding.rvRecommendationItinerary.adapter = adapter
     }
 
-    private fun setupExpandableListView() {
-        val dates = listOf("30 Desember 2024", "31 Desember 2024")
-        val itineraryMap = hashMapOf(
-            "30 Desember 2024" to listOf(
-                ItineraryItem(R.drawable.image_sample, "7.00-8.00", "Place 1", "$ 100000"),
-                ItineraryItem(R.drawable.image_sample, "8.00-9.00", "Place 2", "$ 200000")
-            ),
-            "31 Desember 2024" to listOf(
-                ItineraryItem(R.drawable.image_sample, "7.00-8.00", "Place 3", "$ 300000"),
-                ItineraryItem(R.drawable.image_sample, "8.00-9.00", "Place 4", "$ 400000")
-            )
-        )
+    private fun setupExpandableListView(dates: String?) {
+        if (dates != null) {
+            val dateList = dates.split(" to ")
+            if (dateList.size == 2) {
+                val startDateString = dateList[0]
+                val endDateString = dateList[1]
 
-        val adapter = ExpandableListAdapter(this, dates, itineraryMap)
-        binding.expandableListView.setAdapter(adapter)
+                val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                val startDate = dateFormat.parse(startDateString)
+                val endDate = dateFormat.parse(endDateString)
+
+                val allDates = getDatesBetween(startDate, endDate, dateFormat)
+                val itineraryMap = hashMapOf<String, List<ItineraryItem>>()
+                allDates.forEach { date ->
+                    itineraryMap[date] = listOf(
+                        ItineraryItem(R.drawable.image_sample, "7.00-8.00", "Place 1", "$ 100000"),
+                        ItineraryItem(R.drawable.image_sample, "8.00-9.00", "Place 2", "$ 200000")
+                    )
+                }
+
+                val adapter = ExpandableListAdapter(this, allDates, itineraryMap)
+                binding.expandableListView.setAdapter(adapter)
+            }
+        }
     }
 
+    private fun getDatesBetween(startDate: Date, endDate: Date, dateFormat: SimpleDateFormat): List<String> {
+        val dates = mutableListOf<String>()
+        val calendar = Calendar.getInstance()
+        calendar.time = startDate
+
+        while (!calendar.time.after(endDate)) {
+            dates.add(dateFormat.format(calendar.time))
+            calendar.add(Calendar.DATE, 1)
+        }
+        return dates
+    }
 
 }
