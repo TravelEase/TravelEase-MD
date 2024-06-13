@@ -5,4 +5,6 @@
     <color name="blue">#008EFF</color>
     <color name="purple">#7351E7</color>
     <color name="purplemuda">#B6A0FF</color>
+    <color name="default_button_color">#7351E7</color>
+    <color name="selected_button_color">#B6A0FF</color>
 </resources>

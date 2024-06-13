@@ -2,14 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="165dp"
-    android:layout_height="190dp"
+    android:layout_width="145dp"
+    android:layout_height="160dp"
     android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="160dp"
-        android:layout_height="180dp"
-        app:cardCornerRadius="15dp"
+        android:layout_width="140dp"
+        android:layout_height="150dp"
+        app:cardCornerRadius="10dp"
         app:cardElevation="8dp">
         <LinearLayout
             android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:orientation="vertical">
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="120dp">
+                android:layout_height="100dp">
                 <ImageView
                     android:id="@+id/iv_item_photo"
                     android:layout_width="match_parent"
@@ -35,29 +35,29 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/inter_semibold"
                     android:text="Place Name"
-                    android:layout_margin="10dp"
+                    android:layout_margin="5dp"
                     android:textColor="@color/white"
-                    android:textSize="17dp"
+                    android:textSize="14dp"
                     android:maxLines="2"/>
             </FrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginVertical="10dp">
+                android:layout_marginHorizontal="5dp"
+                android:layout_marginVertical="5dp">
                 <TextView
                     android:id="@+id/tv_item_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     android:layout_weight="1"
                     tools:text="$ 100000" />
-
                 <Button
                     android:id="@+id/btn_add"
-                    android:layout_width="80dp"
+                    android:layout_width="70dp"
                     android:layout_height="40dp"
+                    android:textSize="11dp"
                     android:text="Add"/>
 
             </LinearLayout>
