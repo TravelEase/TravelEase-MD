@@ -29,7 +29,7 @@
 
     <TextView
         android:id="@+id/tv_item_place"
-        android:layout_width="320"
+        android:layout_width="320dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:fontFamily="@font/open_sans_semibold"

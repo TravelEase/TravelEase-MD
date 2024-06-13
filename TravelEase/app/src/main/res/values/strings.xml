@@ -24,7 +24,15 @@
     <string name="empty_image">Image kosong, isi dulu</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="register">Register</string>
-    <string name="saved">Saved</string>
-    <string name="create">Create</string>
+    <string name="saved">Saved Itinerary</string>
+    <string name="create">Create Itinerary</string>
     <string name="profile">Profile</string>
+
+    <string-array name="city_names">
+        <item>Jakarta</item>
+        <item>Bandung</item>
+        <item>Surabaya</item>
+        <item>Yogyakarta</item>
+        <item>Semarang</item>
+    </string-array>
 </resources>
