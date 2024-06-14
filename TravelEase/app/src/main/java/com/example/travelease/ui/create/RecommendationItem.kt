@@ -6,6 +6,8 @@ sealed class ListItem {
         val imageResId: Int,
         val timeMinutes: String,
         val placeName: String,
-        val price: String
+        val price: String,
+        val date: String  // Add date field here
     ) : ListItem()
 }
+
