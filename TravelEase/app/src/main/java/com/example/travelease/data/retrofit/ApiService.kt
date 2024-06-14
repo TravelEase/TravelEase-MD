@@ -9,4 +9,5 @@ import retrofit2.http.POST
 interface ApiService {
     @POST("recommend/")
     fun getRecommendations(@Body request: AutoGenerateItineraryRequest): Call<List<AutoGenerateItineraryResponse>>
+
 }

@@ -6,7 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.travelease.databinding.ExpandLayoutBinding
 import com.example.travelease.databinding.ItemRecommendationBinding
 
-class ExpandableAdapter(private val items: List<ListItem>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ExpandableAdapter(
+    private val items: MutableList<ListItem>,
+    private val onDeleteClick: (ListItem.RecommendationItem, String) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val VIEW_TYPE_HEADER = 0
     private val VIEW_TYPE_ITEM = 1
@@ -27,54 +30,21 @@ class ExpandableAdapter(private val items: List<ListItem>) : RecyclerView.Adapte
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val currentPosition = getActualPosition(position)
         when (holder) {
-            is DateHeaderViewHolder -> holder.bind(items[currentPosition] as ListItem.DateHeader, currentPosition)
-            is RecommendationViewHolder -> holder.bind(items[currentPosition] as ListItem.RecommendationItem)
+            is DateHeaderViewHolder -> holder.bind(items[position] as ListItem.DateHeader, position)
+            is RecommendationViewHolder -> holder.bind(items[position] as ListItem.RecommendationItem)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (items[getActualPosition(position)]) {
+        return when (items[position]) {
             is ListItem.DateHeader -> VIEW_TYPE_HEADER
             is ListItem.RecommendationItem -> VIEW_TYPE_ITEM
         }
     }
 
     override fun getItemCount(): Int {
-        var count = 0
-        items.forEachIndexed { index, item ->
-            if (item is ListItem.DateHeader) {
-                count++
-                if (expandedItems.contains(index)) {
-                    count += items.subList(index + 1, items.size).takeWhile { it is ListItem.RecommendationItem }.size
-                }
-            }
-        }
-        return count
-    }
-
-    private fun getActualPosition(position: Int): Int {
-        var actualPosition = 0
-        var currentCount = 0
-        items.forEachIndexed { index, item ->
-            if (item is ListItem.DateHeader) {
-                if (currentCount == position) {
-                    actualPosition = index
-                    return actualPosition
-                }
-                currentCount++
-                if (expandedItems.contains(index)) {
-                    val itemCount = items.subList(index + 1, items.size).takeWhile { it is ListItem.RecommendationItem }.size
-                    if (currentCount + itemCount >= position) {
-                        actualPosition = index + 1 + (position - currentCount)
-                        return actualPosition
-                    }
-                    currentCount += itemCount
-                }
-            }
-        }
-        return actualPosition
+        return items.size
     }
 
     inner class DateHeaderViewHolder(private val binding: ExpandLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -97,6 +67,23 @@ class ExpandableAdapter(private val items: List<ListItem>) : RecyclerView.Adapte
             binding.tvItemPlace.text = item.placeName
             binding.tvItemPrice.text = item.price
             binding.tfTime.setText(item.timeMinutes)
+
+            binding.ivDelete.setOnClickListener {
+                val dateHeader = findDateHeaderForPosition(adapterPosition)
+                if (dateHeader != null) {
+                    onDeleteClick(item, dateHeader.date)
+                }
+            }
         }
     }
+
+    private fun findDateHeaderForPosition(position: Int): ListItem.DateHeader? {
+        for (i in position downTo 0) {
+            if (items[i] is ListItem.DateHeader) {
+                return items[i] as ListItem.DateHeader
+            }
+        }
+        return null
+    }
 }
+

@@ -1,7 +1,10 @@
 package com.example.travelease.ui.create
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.travelease.R
@@ -20,11 +23,16 @@ import java.util.*
 class ContinueCreateItineraryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityContinueCreateItineraryBinding
+    private lateinit var expandableAdapter: ExpandableAdapter
+    private val items = mutableListOf<ListItem>()
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContinueCreateItineraryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sharedPreferences = getSharedPreferences("itinerary_prefs", Context.MODE_PRIVATE)
 
         // Get data from intent
         val categories = intent.getStringArrayListExtra(CreateFragment.EXTRA_CATEGORY) ?: arrayListOf()
@@ -37,7 +45,6 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         binding.tvCity.text = city
         binding.tvNumberOfPeople.text = "Number of people: $numberOfPeople"
 
-//        setupRecommendationRecyclerView()
         setupExpandableListView(dates, categories, city)
     }
 
@@ -69,11 +76,10 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
                                 val endDate = dateFormat.parse(endDateString)
 
                                 val allDates = getDatesBetween(startDate, endDate, dateFormat)
-                                val items = mutableListOf<ListItem>()
 
                                 allDates.forEach { date ->
                                     items.add(ListItem.DateHeader(date))
-                                    items.addAll(recommendations.mapNotNull { recommendation ->
+                                    val dateItems = recommendations.mapNotNull { recommendation ->
                                         val placeName = recommendation.placeName ?: return@mapNotNull null
                                         val timeMinutes = recommendation.timeMinutes?.let { "$it minutes" } ?: return@mapNotNull null
                                         val price = recommendation.price?.let { "$ $it" } ?: return@mapNotNull null
@@ -83,10 +89,12 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
                                             placeName,
                                             price
                                         )
-                                    })
+                                    }
+                                    items.addAll(dateItems)
+                                    saveItemsForDate(date, dateItems)
                                 }
 
-                                setupRecyclerView(items)
+                                setupRecyclerView()
                             }
                         } else {
                             Log.e("ContinueCreateItinerary", "No recommendations found")
@@ -105,10 +113,59 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupRecyclerView(items: List<ListItem>) {
-        val adapter = ExpandableAdapter(items)
+    private fun saveItemsForDate(date: String, items: List<ListItem.RecommendationItem>) {
+        val gson = Gson()
+        val json = gson.toJson(items)
+        sharedPreferences.edit().putString(date, json).apply()
+    }
+
+    private fun getItemsForDate(date: String): List<ListItem.RecommendationItem> {
+        val gson = Gson()
+        val json = sharedPreferences.getString(date, null)
+        return if (json != null) {
+            val type = object : TypeToken<List<ListItem.RecommendationItem>>() {}.type
+            gson.fromJson(json, type)
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun setupRecyclerView() {
+        expandableAdapter = ExpandableAdapter(items) { item, date ->
+            showDeleteConfirmationDialog(item, date)
+        }
         binding.rvAutoItinerary.layoutManager = LinearLayoutManager(this)
-        binding.rvAutoItinerary.adapter = adapter
+        binding.rvAutoItinerary.adapter = expandableAdapter
+    }
+
+    private fun showDeleteConfirmationDialog(item: ListItem.RecommendationItem, date: String) {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Delete Confirmation")
+            .setMessage("Are you sure you want to delete destination '${item.placeName}' on date '$date'?")
+            .setPositiveButton("OK") { _, _ ->
+                removeItem(item, date)
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
+    }
+
+    private fun removeItem(item: ListItem.RecommendationItem, date: String) {
+        val updatedItems = getItemsForDate(date).toMutableList()
+        updatedItems.remove(item)
+        saveItemsForDate(date, updatedItems)
+        reloadItems()
+    }
+
+    private fun reloadItems() {
+        items.clear()
+        val allDates = sharedPreferences.all.keys
+        allDates.forEach { date ->
+            items.add(ListItem.DateHeader(date))
+            items.addAll(getItemsForDate(date))
+        }
+        expandableAdapter.notifyDataSetChanged()
     }
 
     private fun getDatesBetween(startDate: Date, endDate: Date, dateFormat: SimpleDateFormat): List<String> {
