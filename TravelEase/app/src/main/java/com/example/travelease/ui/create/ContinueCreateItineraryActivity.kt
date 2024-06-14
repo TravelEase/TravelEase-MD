@@ -40,7 +40,51 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         binding.tvCity.text = city
         binding.tvNumberOfPeople.text = "Number of people: $numberOfPeople"
 
+        setupRecommendationRecyclerView(city)
         setupExpandableListView(dates, categories, city)
+    }
+
+    private fun setupRecommendationRecyclerView(city: String?) {
+        if (city != null) {
+            val categories = listOf("Taman Hiburan", "Budaya", "Cagar Alam", "Bahari", "Tempat Ibadah", "Pusat Perbelanjaan")
+            val request = AutoGenerateItineraryRequest(categories, city)
+            val client = ApiConfig.getApiService().getRecommendations(request)
+
+            client.enqueue(object : Callback<List<AutoGenerateItineraryResponse>> {
+                override fun onResponse(
+                    call: Call<List<AutoGenerateItineraryResponse>>,
+                    response: Response<List<AutoGenerateItineraryResponse>>
+                ) {
+                    if (response.isSuccessful) {
+                        val recommendations = response.body()
+                        if (recommendations != null) {
+                            val items = recommendations.mapNotNull { recommendation ->
+                                val placeName = recommendation.placeName ?: return@mapNotNull null
+                                val price = recommendation.price?.let { "$ $it" } ?: return@mapNotNull null
+                                SimpleRecommendationItem(
+                                    R.drawable.image_sample,
+                                    placeName,
+                                    price
+                                )
+                            }
+                            setupRecommendationAdapter(items)
+                        }
+                    } else {
+                        Log.e("ContinueCreateItinerary", "Response not successful: ${response.errorBody()?.string()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<List<AutoGenerateItineraryResponse>>, t: Throwable) {
+                    Log.e("ContinueCreateItinerary", "Error fetching recommendations", t)
+                }
+            })
+        }
+    }
+
+    private fun setupRecommendationAdapter(items: List<SimpleRecommendationItem>) {
+        val adapter = SimpleRecommendationAdapter(items)
+        binding.rvRecommendationItinerary.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvRecommendationItinerary.adapter = adapter
     }
 
     private fun setupExpandableListView(dates: String?, categories: List<String>, city: String?) {

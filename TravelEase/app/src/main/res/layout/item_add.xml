@@ -52,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
                     android:layout_weight="1"
-                    tools:text="$ 100000" />
+                    tools:text="Rp 299000" />
                 <Button
                     android:id="@+id/btn_add"
                     android:layout_width="70dp"
