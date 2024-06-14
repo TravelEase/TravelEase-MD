@@ -5,10 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.travelease.databinding.ItemRecommendationBinding
 
-class RecommendationAdapter(private val items: List<RecommendationItem>) : RecyclerView.Adapter<RecommendationAdapter.ViewHolder>() {
+class RecommendationAdapter(private val items: List<ListItem.RecommendationItem>) : RecyclerView.Adapter<RecommendationAdapter.ViewHolder>() {
 
     class ViewHolder(private val binding: ItemRecommendationBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: RecommendationItem) {
+        fun bind(item: ListItem.RecommendationItem) {
             binding.ivItemPhoto.setImageResource(item.imageResId)
             binding.tvItemPlace.text = item.placeName
             binding.tvItemPrice.text = item.price
