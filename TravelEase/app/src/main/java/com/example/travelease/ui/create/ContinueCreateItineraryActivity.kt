@@ -2,18 +2,13 @@ package com.example.travelease.ui.create
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.travelease.R
 import com.example.travelease.data.retrofit.ApiConfig
 import com.example.travelease.data.response.AutoGenerateItineraryRequest
 import com.example.travelease.data.response.AutoGenerateItineraryResponse
 import com.example.travelease.databinding.ActivityContinueCreateItineraryBinding
-import com.example.travelease.databinding.ExpandLayoutBinding
-import com.example.travelease.databinding.ItemRecommendationBinding
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import retrofit2.Call
@@ -45,18 +40,6 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
 //        setupRecommendationRecyclerView()
         setupExpandableListView(dates, categories, city)
     }
-
-//    private fun setupRecommendationRecyclerView() {
-//        val items = listOf(
-//            RecommendationItem(R.drawable.image_sample, "60 minutes", "Place 1", "$ 100000"),
-//            RecommendationItem(R.drawable.image_sample, "60 minutes", "Place 2", "$ 200000"),
-//            RecommendationItem(R.drawable.image_sample, "60 minutes", "Place 3", "$ 300000")
-//        )
-//
-//        val adapter = RecommendationAdapter(items)
-//        binding.rvRecommendationItinerary.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-//        binding.rvRecommendationItinerary.adapter = adapter
-//    }
 
     private fun setupExpandableListView(dates: String?, categories: List<String>, city: String?) {
         if (dates != null && city != null) {
