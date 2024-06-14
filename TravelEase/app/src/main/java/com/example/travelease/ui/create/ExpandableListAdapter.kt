@@ -5,15 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.travelease.databinding.ExpandLayoutBinding
-import com.example.travelease.databinding.ItemRecommendationBinding
-
-data class ItineraryItem(val imageResId: Int, val time: String, val place: String, val price: String)
 
 class ExpandableListAdapter(
     private val context: Context,
     private val dates: List<String>,
-    private val itineraryMap: HashMap<String, List<ItineraryItem>>
+    private val itineraryMap: HashMap<String, List<RecommendationItem>>
 ) : BaseExpandableListAdapter() {
 
     override fun getChild(groupPosition: Int, childPosition: Int): Any {
@@ -59,17 +58,26 @@ class ExpandableListAdapter(
         return binding.root
     }
 
-    override fun getChildView(groupPosition: Int, childPosition: Int, isLastChild: Boolean, convertView: View?, parent: ViewGroup?): View {
+    override fun getChildView(
+        groupPosition: Int,
+        childPosition: Int,
+        isLastChild: Boolean,
+        convertView: View?,
+        parent: ViewGroup?
+    ): View {
         val binding = if (convertView == null) {
-            ItemRecommendationBinding.inflate(LayoutInflater.from(context), parent, false)
+            ExpandLayoutBinding.inflate(LayoutInflater.from(context), parent, false)
         } else {
-            ItemRecommendationBinding.bind(convertView)
+            ExpandLayoutBinding.bind(convertView)
         }
-        val item = getChild(groupPosition, childPosition) as ItineraryItem
-        binding.ivItemPhoto.setImageResource(item.imageResId)
-        binding.tfTime.setText(item.time)
-        binding.tvItemPlace.text = item.place
-        binding.tvItemPrice.text = item.price
+        val items = itineraryMap[dates[groupPosition]] ?: listOf()
+        setupRecyclerView(binding.rvAutoItinerary, items)
         return binding.root
+    }
+
+    private fun setupRecyclerView(recyclerView: RecyclerView, items: List<RecommendationItem>) {
+        val adapter = RecommendationAdapter(items)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = adapter
     }
 }

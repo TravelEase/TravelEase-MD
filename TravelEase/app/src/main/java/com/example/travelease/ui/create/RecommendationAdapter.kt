@@ -3,22 +3,21 @@ package com.example.travelease.ui.create
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.travelease.databinding.ItemAddBinding
-
-data class RecommendationItem(val imageResId: Int, val placeName: String, val price: String)
+import com.example.travelease.databinding.ItemRecommendationBinding
 
 class RecommendationAdapter(private val items: List<RecommendationItem>) : RecyclerView.Adapter<RecommendationAdapter.ViewHolder>() {
 
-    class ViewHolder(private val binding: ItemAddBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(private val binding: ItemRecommendationBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: RecommendationItem) {
             binding.ivItemPhoto.setImageResource(item.imageResId)
-            binding.tvPlaceName.text = item.placeName
+            binding.tvItemPlace.text = item.placeName
             binding.tvItemPrice.text = item.price
+            binding.tfTime.setText(item.timeMinutes)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemAddBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemRecommendationBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 

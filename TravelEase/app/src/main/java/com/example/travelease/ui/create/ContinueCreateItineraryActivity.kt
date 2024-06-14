@@ -1,10 +1,19 @@
 package com.example.travelease.ui.create
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.travelease.R
+import com.example.travelease.data.response.AutoGenerateItineraryRequest
+import com.example.travelease.data.response.AutoGenerateItineraryResponse
+import com.example.travelease.data.retrofit.ApiConfig
 import com.example.travelease.databinding.ActivityContinueCreateItineraryBinding
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,58 +37,143 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         binding.tvCity.text = city
         binding.tvNumberOfPeople.text = "Number of people: $numberOfPeople"
 
-        setupRecommendationRecyclerView()
-        setupExpandableListView(dates)
+//        setupExpandableListView(dates, categories, city)
+        fetchAndDisplayData(categories, city)
+
     }
 
-    private fun setupRecommendationRecyclerView() {
-        val items = listOf(
-            RecommendationItem(R.drawable.image_sample, "Place 1", "$ 100000"),
-            RecommendationItem(R.drawable.image_sample, "Place 2", "$ 200000"),
-            RecommendationItem(R.drawable.image_sample, "Place 3", "$ 300000")
-        )
+    private fun fetchAndDisplayData(categories: List<String>, city: String?) {
+        if (city != null) {
+            val request = AutoGenerateItineraryRequest(categories, city)
+            val client = ApiConfig.getApiService().getRecommendations(request)
 
-        val adapter = RecommendationAdapter(items)
-        binding.rvRecommendationItinerary.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.rvRecommendationItinerary.adapter = adapter
-    }
+            client.enqueue(object : Callback<List<AutoGenerateItineraryResponse>> {
+                override fun onResponse(
+                    call: Call<List<AutoGenerateItineraryResponse>>,
+                    response: Response<List<AutoGenerateItineraryResponse>>
+                ) {
+                    if (response.isSuccessful) {
+                        val recommendations = response.body()
+                        if (recommendations != null) {
+                            val gson = Gson()
+                            val type = object : TypeToken<List<AutoGenerateItineraryResponse>>() {}.type
+                            val jsonResponse = gson.toJson(recommendations, type)
+                            Log.d("ContinueCreateItinerary", "Raw JSON Response: $jsonResponse")
 
-    private fun setupExpandableListView(dates: String?) {
-        if (dates != null) {
-            val dateList = dates.split(" to ")
-            if (dateList.size == 2) {
-                val startDateString = dateList[0]
-                val endDateString = dateList[1]
+                            recommendations.forEach { recommendation ->
+                                Log.d("ContinueCreateItinerary", "Place Name: ${recommendation.placeName}")
+                                Log.d("ContinueCreateItinerary", "Time Minutes: ${recommendation.timeMinutes}")
+                                Log.d("ContinueCreateItinerary", "Price: ${recommendation.price}")
+                            }
 
-                val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-                val startDate = dateFormat.parse(startDateString)
-                val endDate = dateFormat.parse(endDateString)
-
-                val allDates = getDatesBetween(startDate, endDate, dateFormat)
-                val itineraryMap = hashMapOf<String, List<ItineraryItem>>()
-                allDates.forEach { date ->
-                    itineraryMap[date] = listOf(
-                        ItineraryItem(R.drawable.image_sample, "7.00-8.00", "Place 1", "$ 100000"),
-                        ItineraryItem(R.drawable.image_sample, "8.00-9.00", "Place 2", "$ 200000")
-                    )
+                            val items = recommendations.mapNotNull { recommendation ->
+                                val placeName = recommendation.placeName ?: return@mapNotNull null
+                                val timeMinutes = recommendation.timeMinutes?.let { "$it minutes" } ?: return@mapNotNull null
+                                val price = recommendation.price?.let { "$ $it" } ?: return@mapNotNull null
+                                RecommendationItem(
+                                    R.drawable.image_sample,
+                                    timeMinutes,
+                                    placeName,
+                                    price
+                                )
+                            }
+                            Log.d("ContinueCreateItinerary", "Items: $items") // Log the items
+                            setupRecyclerView(items)
+                        } else {
+                            Log.e("ContinueCreateItinerary", "No recommendations found")
+                        }
+                    } else {
+                        Log.e("ContinueCreateItinerary", "Response not successful: ${response.errorBody()?.string()}")
+                    }
                 }
 
-                val adapter = ExpandableListAdapter(this, allDates, itineraryMap)
-                binding.expandableListView.setAdapter(adapter)
-            }
+                override fun onFailure(call: Call<List<AutoGenerateItineraryResponse>>, t: Throwable) {
+                    Log.e("ContinueCreateItinerary", "Error fetching recommendations", t)
+                }
+            })
+        } else {
+            Log.e("ContinueCreateItinerary", "City is null")
         }
     }
 
-    private fun getDatesBetween(startDate: Date, endDate: Date, dateFormat: SimpleDateFormat): List<String> {
-        val dates = mutableListOf<String>()
-        val calendar = Calendar.getInstance()
-        calendar.time = startDate
-
-        while (!calendar.time.after(endDate)) {
-            dates.add(dateFormat.format(calendar.time))
-            calendar.add(Calendar.DATE, 1)
-        }
-        return dates
+    private fun setupRecyclerView(items: List<RecommendationItem>) {
+        val adapter = RecommendationAdapter(items)
+        binding.rvAutoItinerary.layoutManager = LinearLayoutManager(this)
+        binding.rvAutoItinerary.adapter = adapter
     }
-
+//    private fun setupRecommendationRecyclerView() {
+//        val items = listOf(
+//            RecommendationItem(R.drawable.image_sample, "60 minutes", "Place 1", "$ 100000"),
+//            RecommendationItem(R.drawable.image_sample, "60 minutes", "Place 2", "$ 200000"),
+//            RecommendationItem(R.drawable.image_sample, "60 minutes", "Place 3", "$ 300000")
+//        )
+//
+//        val adapter = RecommendationAdapter(items)
+//        binding.rvRecommendationItinerary.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+//        binding.rvRecommendationItinerary.adapter = adapter
+//    }
+//
+//    private fun setupExpandableListView(dates: String?, categories: List<String>, city: String?) {
+//        if (dates != null && city != null) {
+//            val dateList = dates.split(" to ")
+//            if (dateList.size == 2) {
+//                val startDateString = dateList[0]
+//                val endDateString = dateList[1]
+//
+//                val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+//                val startDate = dateFormat.parse(startDateString)
+//                val endDate = dateFormat.parse(endDateString)
+//
+//                val allDates = getDatesBetween(startDate, endDate, dateFormat)
+//                val request = AutoGenerateItineraryRequest(categories, city)
+//                val client = ApiConfig.getApiService().getRecommendations(request)
+//
+//                client.enqueue(object : Callback<List<AutoGenerateItineraryResponse>> {
+//                    override fun onResponse(
+//                        call: Call<List<AutoGenerateItineraryResponse>>,
+//                        response: Response<List<AutoGenerateItineraryResponse>>
+//                    ) {
+//                        if (response.isSuccessful) {
+//                            val recommendations = response.body()
+//                            if (recommendations != null) {
+//                                val itineraryMap = hashMapOf<String, List<RecommendationItem>>()
+//                                allDates.forEach { date ->
+//                                    val items = recommendations.mapNotNull { recommendation ->
+//                                        val placeName = recommendation.placeName ?: return@mapNotNull null
+//                                        val timeMinutes = recommendation.timeMinutes?.let { "$it minutes" } ?: return@mapNotNull null
+//                                        val price = recommendation.price?.let { "$ $it" } ?: return@mapNotNull null
+//                                        RecommendationItem(
+//                                            R.drawable.image_sample,
+//                                            timeMinutes,
+//                                            placeName,
+//                                            price
+//                                        )
+//                                    }
+//                                    itineraryMap[date] = items
+//                                }
+//                                val adapter = ExpandableListAdapter(this@ContinueCreateItineraryActivity, allDates, itineraryMap)
+//                                binding.expandableListView.setAdapter(adapter)
+//                            }
+//                        }
+//                    }
+//
+//                    override fun onFailure(call: Call<List<AutoGenerateItineraryResponse>>, t: Throwable) {
+//                        Log.e("ContinueCreateItineraryActivity", "Error fetching recommendations", t)
+//                    }
+//                })
+//            }
+//        }
+//    }
+//
+//    private fun getDatesBetween(startDate: Date, endDate: Date, dateFormat: SimpleDateFormat): List<String> {
+//        val dates = mutableListOf<String>()
+//        val calendar = Calendar.getInstance()
+//        calendar.time = startDate
+//
+//        while (!calendar.time.after(endDate)) {
+//            dates.add(dateFormat.format(calendar.time))
+//            calendar.add(Calendar.DATE, 1)
+//        }
+//        return dates
+//    }
 }
