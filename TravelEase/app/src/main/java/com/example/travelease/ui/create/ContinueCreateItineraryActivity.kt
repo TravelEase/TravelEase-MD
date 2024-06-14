@@ -23,6 +23,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityContinueCreateItineraryBinding
     private lateinit var expandableAdapter: ExpandableAdapter
     private val items = mutableListOf<ListItem>()
+    private val recommendationItems = mutableListOf<SimpleRecommendationItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +68,9 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
                                     price
                                 )
                             }
-                            setupRecommendationAdapter(items)
+                            recommendationItems.clear()
+                            recommendationItems.addAll(items)
+                            setupRecommendationAdapter()
                         }
                     } else {
                         Log.e("ContinueCreateItinerary", "Response not successful: ${response.errorBody()?.string()}")
@@ -81,11 +84,50 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupRecommendationAdapter(items: List<SimpleRecommendationItem>) {
-        val adapter = SimpleRecommendationAdapter(items)
+    private fun setupRecommendationAdapter() {
+        val adapter = SimpleRecommendationAdapter(recommendationItems) { item ->
+            showDateSelectionDialog(item)
+        }
         binding.rvRecommendationItinerary.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.rvRecommendationItinerary.adapter = adapter
     }
+
+    private fun showDateSelectionDialog(item: SimpleRecommendationItem) {
+        val dates = items.filterIsInstance<ListItem.DateHeader>().map { it.date }
+        val options = dates.toTypedArray()
+        var selectedDate: String? = null
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Select Date")
+            .setSingleChoiceItems(options, -1) { _, which ->
+                selectedDate = options[which]
+            }
+            .setPositiveButton("OK") { _, _ ->
+                selectedDate?.let { date ->
+                    addItemToItinerary(item, date)
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
+    }
+
+    private fun addItemToItinerary(item: SimpleRecommendationItem, date: String) {
+        val newItem = ListItem.RecommendationItem(
+            item.imageResId,
+            "N/A",
+            item.placeName,
+            item.price,
+            date
+        )
+        val dateIndex = items.indexOfFirst { it is ListItem.DateHeader && it.date == date }
+        if (dateIndex != -1) {
+            items.add(dateIndex + 1, newItem)
+            expandableAdapter.notifyItemInserted(dateIndex + 1)
+        }
+    }
+
 
     private fun setupExpandableListView(dates: String?, categories: List<String>, city: String?) {
         if (dates != null && city != null) {
@@ -120,7 +162,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
                                     items.add(ListItem.DateHeader(date))
                                     items.addAll(recommendations.mapNotNull { recommendation ->
                                         val placeName = recommendation.placeName ?: return@mapNotNull null
-                                        val timeMinutes = recommendation.timeMinutes?.let { "$it minutes" } ?: return@mapNotNull null
+                                        val timeMinutes = recommendation.timeMinutes?.let { "${it.toInt()} minutes" } ?: return@mapNotNull null
                                         val price = recommendation.price?.let { "$ $it" } ?: return@mapNotNull null
                                         ListItem.RecommendationItem(
                                             R.drawable.image_sample,
