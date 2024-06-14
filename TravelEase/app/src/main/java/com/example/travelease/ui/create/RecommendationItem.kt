@@ -7,7 +7,7 @@ sealed class ListItem {
         val timeMinutes: String,
         val placeName: String,
         val price: String,
-        val date: String  // Add date field here
+        val date: String
     ) : ListItem()
 }
 

@@ -128,5 +128,12 @@ class ExpandableAdapter(
             // Notify the adapter of the changes in the dataset
             notifyDataSetChanged()
         }
+
+    }
+
+    fun updateItems(newItems: List<ListItem>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
     }
 }

@@ -45,6 +45,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         setupExpandableListView(dates, categories, city)
     }
 
+    //CODE UNTUK CARD RECOMMENDATION
     private fun setupRecommendationRecyclerView(city: String?) {
         if (city != null) {
             val categories = listOf("Taman Hiburan", "Budaya", "Cagar Alam", "Bahari", "Tempat Ibadah", "Pusat Perbelanjaan")
@@ -91,7 +92,8 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         binding.rvRecommendationItinerary.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.rvRecommendationItinerary.adapter = adapter
     }
-
+    //CODE UNTUK CARD RECOMMENDATION
+    //CODE UNTUK ADD DESTINATION ITEM
     private fun showDateSelectionDialog(item: SimpleRecommendationItem) {
         val dates = items.filterIsInstance<ListItem.DateHeader>().map { it.date }
         val options = dates.toTypedArray()
@@ -125,10 +127,11 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         if (dateIndex != -1) {
             items.add(dateIndex + 1, newItem)
             expandableAdapter.notifyItemInserted(dateIndex + 1)
+            updateTotalPrice()
         }
     }
-
-
+    //CODE UNTUK ADD DESTINATION ITEM
+    //CODE UNTUK AUTO GENERATE ITINERARY
     private fun setupExpandableListView(dates: String?, categories: List<String>, city: String?) {
         if (dates != null && city != null) {
             val request = AutoGenerateItineraryRequest(categories, city)
@@ -199,6 +202,8 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         }
         binding.rvAutoItinerary.layoutManager = LinearLayoutManager(this)
         binding.rvAutoItinerary.adapter = expandableAdapter
+
+        updateTotalPrice()
     }
 
     private fun showDeleteConfirmationDialog(item: ListItem.RecommendationItem, date: String) {
@@ -207,6 +212,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
             .setMessage("Are you sure you want to delete destination '${item.placeName}' on this date: $date?")
             .setPositiveButton("OK") { _, _ ->
                 expandableAdapter.removeItem(item)
+                updateTotalPrice()
             }
             .setNegativeButton("Cancel", null)
             .create()
@@ -225,4 +231,31 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         }
         return dates
     }
+    //CODE UNTUK AUTO GENERATE ITINERARY
+    //CODE UNTUK TOTAL PRICE
+    private fun calculateTotalPrice(itineraryItems: List<ListItem>): Int {
+        val numberOfPeople = intent.getIntExtra(CreateFragment.EXTRA_NUMBER_OF_PEOPLE, 1)
+        var totalPrice = 0
+
+        itineraryItems.forEach { item ->
+            if (item is ListItem.RecommendationItem) {
+                val priceString = item.price.removePrefix("$ ").replace(",", "")
+                val price = try {
+                    priceString.toInt()
+                } catch (e: NumberFormatException) {
+                    0
+                }
+                totalPrice += price
+            }
+        }
+
+        return totalPrice * numberOfPeople
+    }
+
+    private fun updateTotalPrice() {
+        val totalPrice = calculateTotalPrice(items)
+        binding.tvTotalPrice.text = "Rp $totalPrice"
+    }
+
+
 }
