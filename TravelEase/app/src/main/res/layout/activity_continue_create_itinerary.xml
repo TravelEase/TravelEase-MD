@@ -100,11 +100,6 @@
                 android:text="Rp Total"/>
         </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="0dp"
-            android:layout_height="0dp"/>
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_auto_itinerary"
             android:layout_width="match_parent"

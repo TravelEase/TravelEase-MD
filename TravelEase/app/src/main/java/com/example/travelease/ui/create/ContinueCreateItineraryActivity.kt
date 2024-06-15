@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.travelease.R
@@ -291,6 +292,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
 
                     val intent = Intent(this@ContinueCreateItineraryActivity, SavedActivity::class.java)
                     startActivity(intent)
+
                 }
             }
         }

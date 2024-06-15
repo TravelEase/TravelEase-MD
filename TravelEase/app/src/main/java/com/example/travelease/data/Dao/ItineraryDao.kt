@@ -12,4 +12,7 @@ interface ItineraryDao {
 
     @Query("SELECT * FROM itinerary")
     suspend fun getAllItineraries(): List<Itinerary>
+
+    @Query("SELECT * FROM itinerary WHERE id = :itineraryId")
+    suspend fun getItineraryById(itineraryId: Int): Itinerary
 }

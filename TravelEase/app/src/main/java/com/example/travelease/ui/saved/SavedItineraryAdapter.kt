@@ -7,8 +7,27 @@ import com.example.travelease.R
 import com.example.travelease.data.entity.Itinerary
 import com.example.travelease.databinding.ItemSavedBinding
 
-class SavedItineraryAdapter(private val items: List<Itinerary>) :
-    RecyclerView.Adapter<SavedItineraryAdapter.SavedItineraryViewHolder>() {
+class SavedItineraryAdapter(
+    private val items: List<Itinerary>,
+    private val onClickListener: OnClickListener
+) : RecyclerView.Adapter<SavedItineraryAdapter.SavedItineraryViewHolder>() {
+    interface OnClickListener {
+        fun onClick(itinerary: Itinerary)
+    }
+
+    inner class SavedItineraryViewHolder(private val binding: ItemSavedBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: Itinerary) {
+            binding.root.setOnClickListener {
+                onClickListener.onClick(item)
+            }
+            binding.tvItemDate.text = "${item.startDate} to ${item.endDate}"
+            binding.tvItemPlace.text = item.city
+            binding.tvItemPrice.text = item.totalPrice.toString()
+            binding.ivItemPhoto.setImageResource(R.drawable.image_sample)
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SavedItineraryViewHolder {
         val binding = ItemSavedBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -20,15 +39,5 @@ class SavedItineraryAdapter(private val items: List<Itinerary>) :
     }
 
     override fun getItemCount(): Int = items.size
-
-    inner class SavedItineraryViewHolder(private val binding: ItemSavedBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(item: Itinerary) {
-            binding.tvItemDate.text = "${item.startDate} to ${item.endDate}"
-            binding.tvItemPlace.text = item.city
-            binding.tvItemPrice.text = item.totalPrice.toString()
-            binding.ivItemPhoto.setImageResource(R.drawable.image_sample)
-        }
-    }
 }
+
