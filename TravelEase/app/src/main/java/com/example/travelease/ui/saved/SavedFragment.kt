@@ -4,44 +4,40 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.travelease.R
+import com.example.travelease.data.room.AppDatabase
 import com.example.travelease.databinding.FragmentSavedBinding
+import kotlinx.coroutines.launch
 
 class SavedFragment : Fragment() {
 
     private var _binding: FragmentSavedBinding? = null
     private val binding get() = _binding!!
-    private lateinit var savedViewModel: SavedViewModel
+//    private lateinit var savedViewModel: SavedViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        savedViewModel = ViewModelProvider(this).get(SavedViewModel::class.java)
         _binding = FragmentSavedBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-        setupRecyclerView()
-
-        return root
+        return binding.root
     }
 
-    private fun setupRecyclerView() {
-        // Sample data
-        val sampleData = listOf(
-            Itinerary(R.drawable.image_sample, "10-06-2023", "Jakarta", "$100"),
-            Itinerary(R.drawable.image_sample, "12-06-2023", "Bandung", "$150"),
-            Itinerary(R.drawable.image_sample, "15-06-2023", "Surabaya", "$200")
-        )
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        loadSavedItineraries()
+    }
 
-         //Setting up the RecyclerView
-        binding.rvSavedItinerary.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvSavedItinerary.adapter = SavedItineraryAdapter(sampleData)
+    private fun loadSavedItineraries() {
+        val itineraryDao = AppDatabase.getDatabase(requireContext()).itineraryDao()
+        lifecycleScope.launch {
+            val itineraries = itineraryDao.getAllItineraries()
+            binding.rvSavedItinerary.layoutManager = LinearLayoutManager(requireContext())
+            binding.rvSavedItinerary.adapter = SavedItineraryAdapter(itineraries)
+        }
     }
 
     override fun onDestroyView() {

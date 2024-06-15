@@ -27,6 +27,7 @@
     <string name="saved">Saved Itinerary</string>
     <string name="create">Create Itinerary</string>
     <string name="profile">Profile</string>
+    <string name="title_fragment_saved">Saved Itinerary</string>
 
     <string-array name="city_names">
         <item>Jakarta</item>

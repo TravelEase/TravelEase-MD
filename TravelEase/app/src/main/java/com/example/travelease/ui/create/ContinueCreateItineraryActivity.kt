@@ -1,17 +1,24 @@
 package com.example.travelease.ui.create
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.travelease.R
+import com.example.travelease.SavedActivity
+import com.example.travelease.data.entity.Itinerary
 import com.example.travelease.data.retrofit.ApiConfig
 import com.example.travelease.data.response.AutoGenerateItineraryRequest
 import com.example.travelease.data.response.AutoGenerateItineraryResponse
+import com.example.travelease.data.room.AppDatabase
 import com.example.travelease.databinding.ActivityContinueCreateItineraryBinding
+import com.example.travelease.ui.saved.SavedFragment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -43,6 +50,11 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
 
         setupRecommendationRecyclerView(city)
         setupExpandableListView(dates, categories, city)
+
+        binding.btnSave.setOnClickListener {
+            saveItinerary(dates, city, numberOfPeople)
+        }
+
     }
 
     //CODE UNTUK CARD RECOMMENDATION
@@ -256,6 +268,32 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         val totalPrice = calculateTotalPrice(items)
         binding.tvTotalPrice.text = "Rp $totalPrice"
     }
+    //CODE UNTUK TOTAL PRICE
+    //CODE UNTUK SAVE ITINERARY
+    private fun saveItinerary(dates: String?, city: String?, numberOfPeople: Int) {
+        if (dates != null && city != null) {
+            val dateList = dates.split(" to ")
+            if (dateList.size == 2) {
+                val startDate = dateList[0]
+                val endDate = dateList[1]
 
+                val totalPrice = calculateTotalPrice(items)
+                val itinerary = Itinerary(
+                    startDate = startDate,
+                    endDate = endDate,
+                    city = city,
+                    totalPrice = totalPrice
+                )
+
+                val itineraryDao = AppDatabase.getDatabase(this).itineraryDao()
+                lifecycleScope.launch {
+                    itineraryDao.insert(itinerary)
+
+                    val intent = Intent(this@ContinueCreateItineraryActivity, SavedActivity::class.java)
+                    startActivity(intent)
+                }
+            }
+        }
+    }
 
 }

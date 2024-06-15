@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:textSize="13sp"
             android:layout_weight="1"
-            tools:text="Nama Tempat" />
+            tools:text="City" />
 
         <TextView
             android:id="@+id/tv_item_price"

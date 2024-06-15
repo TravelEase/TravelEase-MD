@@ -15,6 +15,10 @@
         android:theme="@style/Theme.TravelEase"
         tools:targetApi="31">
         <activity
+            android:name=".ui.saved.SavedFragment"
+            android:exported="false"
+            android:label="@string/title_fragment_saved" />
+        <activity
             android:name=".SavedActivity"
             android:exported="false"
             android:label="@string/title_activity_saved" />
