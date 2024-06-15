@@ -2,6 +2,7 @@ package com.example.travelease.ui.saved
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +22,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class EditItineraryActivity : AppCompatActivity() {
 
@@ -35,41 +38,39 @@ class EditItineraryActivity : AppCompatActivity() {
         binding = ActivityEditItineraryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val itineraryId = intent.getIntExtra("itinerary_id", -1)
-        if (itineraryId != -1) {
-            val itineraryDao = AppDatabase.getDatabase(this).itineraryDao()
-            lifecycleScope.launch {
-                val itinerary = itineraryDao.getItineraryById(itineraryId)
-                displayItineraryDetails(itinerary)
-                fetchRecommendations(itinerary.city)
-            }
+        val itineraryJson = intent.getStringExtra("EXTRA_ITINERARY")
+        Log.d("EditItineraryActivity", "EXTRA_ITINERARY: $itineraryJson")
+
+        if (itineraryJson != null) {
+            val gson = Gson()
+            val type = object : TypeToken<Itinerary>() {}.type
+            val itinerary = gson.fromJson<Itinerary>(itineraryJson, type)
+            displayItineraryDetails(itinerary)
+            fetchRecommendations(itinerary.city)
         }
+
     }
 
+    //UNTUK DISPLAY ITINERARY
     private fun displayItineraryDetails(itinerary: Itinerary) {
         binding.tvCity.text = itinerary.city
-        binding.tvNumberOfPeople.text = "Number of people: ${intent.getIntExtra(CreateFragment.EXTRA_NUMBER_OF_PEOPLE, 1)}"
+        binding.tvNumberOfPeople.text = "Number of people: ${itinerary.numberOfPeople}"
         binding.tvTotalPrice.text = "Rp ${itinerary.totalPrice}"
+        binding.tvCategory.text = "Categories: ${itinerary.kategori.joinToString(", ")}"
 
-        val dateList = itinerary.startDate.split(" to ")
-        if (dateList.size == 2) {
-            val startDateString = dateList[0]
-            val endDateString = dateList[1]
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val startDate = dateFormat.parse(itinerary.startDate)
+        val endDate = dateFormat.parse(itinerary.endDate)
 
-            val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-            val startDate = dateFormat.parse(startDateString)
-            val endDate = dateFormat.parse(endDateString)
+        val allDates = getDatesBetween(startDate, endDate, dateFormat).sorted()
 
-            val allDates = getDatesBetween(startDate, endDate, dateFormat).sorted()
-
-            allDates.forEach { date ->
-                items.add(ListItem.DateHeader(date))
-                // Assuming you have saved ListItem.RecommendationItem as part of Itinerary
-                // Add logic to fetch these items and add to 'items'
-            }
-
-            setupRecyclerView()
+        allDates.forEach { date ->
+            items.add(ListItem.DateHeader(date))
+            val itineraryItems = itinerary.items.filter { it.date == date }
+            items.addAll(itineraryItems)
         }
+
+        setupRecyclerView()
 
         binding.btnEdit.setOnClickListener {
             saveItinerary(itinerary)
@@ -156,12 +157,19 @@ class EditItineraryActivity : AppCompatActivity() {
     }
 
     private fun calculateTotalPrice(itineraryItems: List<ListItem>): Int {
-        val numberOfPeople = intent.getIntExtra(CreateFragment.EXTRA_NUMBER_OF_PEOPLE, 1)
+
+        // Ambil JSON itinerary dari intent
+        val itineraryJson = intent.getStringExtra("EXTRA_ITINERARY")
+        val gson = Gson()
+        val type = object : TypeToken<Itinerary>() {}.type
+        val itinerary = gson.fromJson<Itinerary>(itineraryJson, type)
+
+        val numberOfPeople = itinerary.numberOfPeople
         var totalPrice = 0
 
         itineraryItems.forEach { item ->
             if (item is ListItem.RecommendationItem) {
-                val priceString = item.price.removePrefix("$ ").replace(",", "")
+                val priceString = item.price.replace("[^\\d]".toRegex(), "") // Remove non-numeric characters
                 val price = try {
                     priceString.toInt()
                 } catch (e: NumberFormatException) {

@@ -1,6 +1,7 @@
 package com.example.travelease
 
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -25,10 +26,8 @@ class SavedActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val navView: BottomNavigationView = binding.navView
-
         val navController = findNavController(R.id.nav_host_fragment_activity_saved)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
         val appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.navigation_saved, R.id.navigation_create, R.id.navigation_profile
@@ -36,5 +35,16 @@ class SavedActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+//        // Retrieve the EXTRA_ITINERARY
+//        val itineraryJson = intent.getStringExtra("EXTRA_ITINERARY")
+//        Log.d("SavedActivity", "EXTRA_ITINERARY: $itineraryJson")
+//
+//        if (itineraryJson != null) {
+//            val bundle = Bundle().apply {
+//                putString("EXTRA_ITINERARY", itineraryJson)
+//            }
+//            navController.navigate(R.id.navigation_saved, bundle)
+//        }
     }
 }

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.travelease.R
@@ -16,7 +15,6 @@ import com.example.travelease.data.response.AutoGenerateItineraryRequest
 import com.example.travelease.data.response.AutoGenerateItineraryResponse
 import com.example.travelease.data.room.AppDatabase
 import com.example.travelease.databinding.ActivityContinueCreateItineraryBinding
-import com.example.travelease.ui.saved.SavedFragment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
@@ -53,7 +51,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         setupExpandableListView(dates, categories, city)
 
         binding.btnSave.setOnClickListener {
-            saveItinerary(dates, city, numberOfPeople)
+            saveItinerary(dates, city, numberOfPeople, categories)
         }
 
     }
@@ -75,7 +73,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
                         if (recommendations != null) {
                             val items = recommendations.mapNotNull { recommendation ->
                                 val placeName = recommendation.placeName ?: return@mapNotNull null
-                                val price = recommendation.price?.let { "$ $it" } ?: return@mapNotNull null
+                                val price = recommendation.price?.let { "Rp $it" } ?: return@mapNotNull null
                                 SimpleRecommendationItem(
                                     R.drawable.image_sample,
                                     placeName,
@@ -131,7 +129,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
     private fun addItemToItinerary(item: SimpleRecommendationItem, date: String) {
         val newItem = ListItem.RecommendationItem(
             item.imageResId,
-            "N/A",
+            "Isi waktu disini",
             item.placeName,
             item.price,
             date
@@ -179,7 +177,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
                                     items.addAll(recommendations.mapNotNull { recommendation ->
                                         val placeName = recommendation.placeName ?: return@mapNotNull null
                                         val timeMinutes = recommendation.timeMinutes?.let { "${it.toInt()} minutes" } ?: return@mapNotNull null
-                                        val price = recommendation.price?.let { "$ $it" } ?: return@mapNotNull null
+                                        val price = recommendation.price?.let { "Rp $it" } ?: return@mapNotNull null
                                         ListItem.RecommendationItem(
                                             R.drawable.image_sample,
                                             timeMinutes,
@@ -252,7 +250,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
 
         itineraryItems.forEach { item ->
             if (item is ListItem.RecommendationItem) {
-                val priceString = item.price.removePrefix("$ ").replace(",", "")
+                val priceString = item.price.removePrefix("Rp ").replace(",", "")
                 val price = try {
                     priceString.toInt()
                 } catch (e: NumberFormatException) {
@@ -271,7 +269,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
     }
     //CODE UNTUK TOTAL PRICE
     //CODE UNTUK SAVE ITINERARY
-    private fun saveItinerary(dates: String?, city: String?, numberOfPeople: Int) {
+    private fun saveItinerary(dates: String?, city: String?, numberOfPeople: Int, categories: List<String>) {
         if (dates != null && city != null) {
             val dateList = dates.split(" to ")
             if (dateList.size == 2) {
@@ -283,19 +281,29 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
                     startDate = startDate,
                     endDate = endDate,
                     city = city,
-                    totalPrice = totalPrice
+                    totalPrice = totalPrice,
+                    items = items.filterIsInstance<ListItem.RecommendationItem>(),
+                    kategori = categories,
+                    numberOfPeople = numberOfPeople
                 )
+
+                val gson = Gson()
+                val itineraryJson = gson.toJson(itinerary)
+
+                // Log the JSON string
+                Log.d("ContinueCreateItinerary", "EXTRA_ITINERARY: $itineraryJson")
 
                 val itineraryDao = AppDatabase.getDatabase(this).itineraryDao()
                 lifecycleScope.launch {
-                    itineraryDao.insert(itinerary)
-
+                    val newId = itineraryDao.insert(itinerary)
                     val intent = Intent(this@ContinueCreateItineraryActivity, SavedActivity::class.java)
+                    intent.putExtra("EXTRA_ITINERARY_ID", newId.toString())
+                    intent.putExtra("EXTRA_ITINERARY", itineraryJson)
                     startActivity(intent)
-
                 }
             }
         }
     }
+
 
 }

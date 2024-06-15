@@ -77,11 +77,12 @@
                 android:text="Budaya"
                 android:layout_marginRight="5dp"/>
             <Button
-                android:id="@+id/btn_cagar_alam"
+                android:id="@+id/btn_pusat_perbelanjaan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/ic_cagar_alam"
-                android:text="Cagar Alam"/>
+                android:drawableLeft="@drawable/ic_pusat_belanja"
+                android:text="Pusat Perbelanjaan"/>
+
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -112,12 +113,13 @@
                 android:drawableLeft="@drawable/ic_tempat_ibadah"
                 android:text="Tempat Ibadah"
                 android:layout_marginRight="5dp"/>
+
             <Button
-                android:id="@+id/btn_pusat_belanja"
+                android:id="@+id/btn_cagar_alam"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/ic_pusat_belanja"
-                android:text="Pusat Belanja"/>
+                android:drawableLeft="@drawable/ic_cagar_alam"
+                android:text="Cagar Alam"/>
         </LinearLayout>
 
         <TextView

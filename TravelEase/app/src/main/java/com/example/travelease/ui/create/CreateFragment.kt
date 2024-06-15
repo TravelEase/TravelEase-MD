@@ -92,7 +92,7 @@ class CreateFragment : Fragment() {
             binding.btnTamanHiburan,
             binding.btnBahari,
             binding.btnTempatIbadah,
-            binding.btnPusatBelanja
+            binding.btnPusatPerbelanjaan
         )
 
         categoryButtons.forEach { button ->
