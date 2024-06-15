@@ -114,7 +114,7 @@ class EditItineraryActivity : AppCompatActivity() {
 
     private fun setupRecommendationAdapter() {
         recommendationAdapter = SimpleRecommendationAdapter(recommendationItems) { item ->
-            // Handle the click
+            showDateSelectionDialog(item)
         }
         binding.rvRecommendationItinerary.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.rvRecommendationItinerary.adapter = recommendationAdapter
@@ -187,12 +187,74 @@ class EditItineraryActivity : AppCompatActivity() {
         binding.tvTotalPrice.text = "Rp $totalPrice"
     }
 
+    //CODE UNTUK ADD DESTINATION ITEM
+    private fun showDateSelectionDialog(item: SimpleRecommendationItem) {
+        val dates = items.filterIsInstance<ListItem.DateHeader>().map { it.date }
+        val options = dates.toTypedArray()
+        var selectedDate: String? = null
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Select Date")
+            .setSingleChoiceItems(options, -1) { _, which ->
+                selectedDate = options[which]
+            }
+            .setPositiveButton("OK") { _, _ ->
+                selectedDate?.let { date ->
+                    addItemToItinerary(item, date)
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
+    }
+
+    private fun addItemToItinerary(item: SimpleRecommendationItem, date: String) {
+        val newItem = ListItem.RecommendationItem(
+            item.imageResId,
+            "Isi waktu disini",
+            item.placeName,
+            item.price,
+            date
+        )
+        val dateIndex = items.indexOfFirst { it is ListItem.DateHeader && it.date == date }
+        if (dateIndex != -1) {
+            items.add(dateIndex + 1, newItem)
+            expandableAdapter.notifyItemInserted(dateIndex + 1)
+            updateTotalPrice()
+        }
+    }
+
+    //CODE SAVE EDIT ITINERARY
     private fun saveItinerary(itinerary: Itinerary) {
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val startDate = dateFormat.format(dateFormat.parse(itinerary.startDate))
+        val endDate = dateFormat.format(dateFormat.parse(itinerary.endDate))
+        val totalPrice = calculateTotalPrice(items)
+
+        val updatedItinerary = Itinerary(
+            id = itinerary.id,  // Use the existing ID
+            startDate = startDate,
+            endDate = endDate,
+            city = itinerary.city,
+            totalPrice = totalPrice,
+            items = items.filterIsInstance<ListItem.RecommendationItem>(),
+            kategori = itinerary.kategori,
+            numberOfPeople = itinerary.numberOfPeople
+        )
+
+        val gson = Gson()
+        val itineraryJson = gson.toJson(updatedItinerary)
+
+        // Log the JSON string
+        Log.d("EditItinerary", "EXTRA_ITINERARY: $itineraryJson")
+
         val itineraryDao = AppDatabase.getDatabase(this).itineraryDao()
         lifecycleScope.launch {
-            itineraryDao.insert(itinerary)
+            itineraryDao.update(updatedItinerary)  // Update the existing itinerary
 
             val intent = Intent(this@EditItineraryActivity, SavedActivity::class.java)
+            intent.putExtra("EXTRA_ITINERARY", itineraryJson)
             startActivity(intent)
         }
     }
