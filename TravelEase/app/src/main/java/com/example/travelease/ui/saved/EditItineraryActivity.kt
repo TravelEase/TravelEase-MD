@@ -3,6 +3,9 @@ package com.example.travelease.ui.saved
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.SearchView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +19,8 @@ import com.example.travelease.data.response.AutoGenerateItineraryResponse
 import com.example.travelease.data.room.AppDatabase
 import com.example.travelease.databinding.ActivityEditItineraryBinding
 import com.example.travelease.ui.create.*
+import com.example.travelease.ui.search.SearchResult
+import com.example.travelease.ui.search.SearchResultsAdapter
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -33,6 +38,8 @@ class EditItineraryActivity : AppCompatActivity() {
     private val items = mutableListOf<ListItem>()
     private val recommendationItems = mutableListOf<SimpleRecommendationItem>()
     private lateinit var itinerary: Itinerary
+    private lateinit var searchResultsAdapter: SearchResultsAdapter
+    private val searchResults = mutableListOf<SearchResult>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +57,135 @@ class EditItineraryActivity : AppCompatActivity() {
             fetchRecommendations(itinerary.city)
         }
 
+        setupSearchResultsRecyclerView()
+        setupSearchView()
+
+        binding.btnAdd.setOnClickListener {
+            val placeName = binding.searchBar.query.toString()
+            if (placeName.isNotEmpty()) {
+                showDateSelectionDialogForAdd(placeName)
+            } else {
+                Toast.makeText(this, "Please enter a place name to add", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    }
+
+    //UNTUK SEARCH
+    // Setup for search results RecyclerView
+    private fun setupSearchResultsRecyclerView() {
+        searchResultsAdapter = SearchResultsAdapter(searchResults) { result ->
+            binding.searchBar.setQuery(result.placeName, false)
+            binding.searchResultsRecyclerView.visibility = View.GONE
+        }
+        binding.searchResultsRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.searchResultsRecyclerView.adapter = searchResultsAdapter
+    }
+
+    // Setup for SearchView
+    private fun setupSearchView() {
+        binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null && newText.isNotEmpty()) {
+                    searchPlaces(newText)
+                } else {
+                    binding.searchResultsRecyclerView.visibility = View.GONE
+                }
+                return true
+            }
+        })
+    }
+
+    private fun searchPlaces(query: String) {
+        val city = itinerary.city
+        val client = ApiConfig.getApiService().searchPlaces(city, query)
+        client.enqueue(object : Callback<List<AutoGenerateItineraryResponse>> {
+            override fun onResponse(
+                call: Call<List<AutoGenerateItineraryResponse>>,
+                response: Response<List<AutoGenerateItineraryResponse>>
+            ) {
+                if (response.isSuccessful) {
+                    val results = response.body()
+                    if (results != null) {
+                        searchResults.clear()
+                        results.forEach { result ->
+                            searchResults.add(
+                                SearchResult(
+                                    placeName = result.placeName.toString(),
+                                    price = "Rp ${result.price}"
+                                )
+                            )
+                        }
+                        searchResultsAdapter.notifyDataSetChanged()
+                        binding.searchResultsRecyclerView.visibility = View.VISIBLE
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<List<AutoGenerateItineraryResponse>>, t: Throwable) {
+                Log.e("EditItineraryActivity", "Search API call failed", t)
+            }
+        })
+    }
+
+    //ADD PADA SEARCH
+    private fun showDateSelectionDialogForAdd(placeName: String) {
+        val dates = items.filterIsInstance<ListItem.DateHeader>().map { it.date }
+        val options = dates.toTypedArray()
+        var selectedDate: String? = null
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Select Date")
+            .setSingleChoiceItems(options, -1) { _, which ->
+                selectedDate = options[which]
+            }
+            .setPositiveButton("OK") { _, _ ->
+                selectedDate?.let { date ->
+                    fetchAndAddItemToItinerary(placeName, date)
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
+    }
+
+    private fun fetchAndAddItemToItinerary(placeName: String, date: String) {
+        val city = itinerary.city
+        val client = ApiConfig.getApiService().searchPlaces(city, placeName)
+        client.enqueue(object : Callback<List<AutoGenerateItineraryResponse>> {
+            override fun onResponse(
+                call: Call<List<AutoGenerateItineraryResponse>>,
+                response: Response<List<AutoGenerateItineraryResponse>>
+            ) {
+                if (response.isSuccessful) {
+                    val results = response.body()
+                    if (!results.isNullOrEmpty()) {
+                        val result = results[0]
+                        val newItem = ListItem.RecommendationItem(
+                            imageResId = R.drawable.image_sample,  // Use the default sample image
+                            timeMinutes = "N/A",  // Default value
+                            placeName = result.placeName.toString(),
+                            price = "Rp ${result.price}",
+                            date = date
+                        )
+                        expandableAdapter.addItemToDate(newItem, date)
+                        updateTotalPrice()
+                    }
+                } else {
+                    Toast.makeText(this@EditItineraryActivity, "Failed to fetch place details", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<AutoGenerateItineraryResponse>>, t: Throwable) {
+                Log.e("EditItineraryActivity", "API call failed", t)
+                Toast.makeText(this@EditItineraryActivity, "Failed to fetch place details", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     //UNTUK DISPLAY ITINERARY
@@ -130,20 +266,6 @@ class EditItineraryActivity : AppCompatActivity() {
 
         updateTotalPrice()
     }
-
-//    private fun showDeleteConfirmationDialog(item: ListItem.RecommendationItem, date: String) {
-//        val dialog = AlertDialog.Builder(this)
-//            .setTitle("Delete Confirmation")
-//            .setMessage("Are you sure you want to delete destination '${item.placeName}' on this date: $date?")
-//            .setPositiveButton("OK") { _, _ ->
-//                expandableAdapter.removeItem(item)
-//                updateTotalPrice()
-//            }
-//            .setNegativeButton("Cancel", null)
-//            .create()
-//
-//        dialog.show()
-//    }
 
     private fun showDeleteConfirmationDialog(item: ListItem.RecommendationItem, date: String) {
         val dialog = AlertDialog.Builder(this)
@@ -257,7 +379,7 @@ class EditItineraryActivity : AppCompatActivity() {
             updateTotalPrice()
         }
     }
-    
+
 
     //CODE SAVE EDIT ITINERARY
     private fun saveItinerary(itinerary: Itinerary) {

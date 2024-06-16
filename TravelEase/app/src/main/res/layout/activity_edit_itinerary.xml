@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -113,4 +113,13 @@
             android:layout_height="wrap_content"
             android:text="Edit"/>
     </LinearLayout>
-</RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/searchResultsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="60dp"
+        android:visibility="gone"
+        android:background="@android:color/white"/>
+</FrameLayout>

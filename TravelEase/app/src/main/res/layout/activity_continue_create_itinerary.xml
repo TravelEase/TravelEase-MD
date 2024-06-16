@@ -33,6 +33,14 @@
                 android:text="Add"/>
         </LinearLayout>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/searchResultsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/wadah1"
+            android:visibility="gone"
+            android:background="@android:color/white"/>
+
         <TextView
             android:id="@+id/tv_tittle_rec"
             android:layout_width="match_parent"
