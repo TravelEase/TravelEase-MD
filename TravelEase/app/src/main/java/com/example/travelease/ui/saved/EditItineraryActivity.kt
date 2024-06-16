@@ -32,6 +32,7 @@ class EditItineraryActivity : AppCompatActivity() {
     private lateinit var recommendationAdapter: SimpleRecommendationAdapter
     private val items = mutableListOf<ListItem>()
     private val recommendationItems = mutableListOf<SimpleRecommendationItem>()
+    private lateinit var itinerary: Itinerary
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +45,7 @@ class EditItineraryActivity : AppCompatActivity() {
         if (itineraryJson != null) {
             val gson = Gson()
             val type = object : TypeToken<Itinerary>() {}.type
-            val itinerary = gson.fromJson<Itinerary>(itineraryJson, type)
+            itinerary = gson.fromJson(itineraryJson, type)
             displayItineraryDetails(itinerary)
             fetchRecommendations(itinerary.city)
         }
@@ -130,11 +131,26 @@ class EditItineraryActivity : AppCompatActivity() {
         updateTotalPrice()
     }
 
+//    private fun showDeleteConfirmationDialog(item: ListItem.RecommendationItem, date: String) {
+//        val dialog = AlertDialog.Builder(this)
+//            .setTitle("Delete Confirmation")
+//            .setMessage("Are you sure you want to delete destination '${item.placeName}' on this date: $date?")
+//            .setPositiveButton("OK") { _, _ ->
+//                expandableAdapter.removeItem(item)
+//                updateTotalPrice()
+//            }
+//            .setNegativeButton("Cancel", null)
+//            .create()
+//
+//        dialog.show()
+//    }
+
     private fun showDeleteConfirmationDialog(item: ListItem.RecommendationItem, date: String) {
         val dialog = AlertDialog.Builder(this)
             .setTitle("Delete Confirmation")
             .setMessage("Are you sure you want to delete destination '${item.placeName}' on this date: $date?")
             .setPositiveButton("OK") { _, _ ->
+                removeItemFromDatabase(item)
                 expandableAdapter.removeItem(item)
                 updateTotalPrice()
             }
@@ -143,6 +159,23 @@ class EditItineraryActivity : AppCompatActivity() {
 
         dialog.show()
     }
+
+    private fun removeItemFromDatabase(item: ListItem.RecommendationItem) {
+        val updatedItems = itinerary.items.toMutableList()
+        updatedItems.removeIf { it.placeName == item.placeName && it.date == item.date }
+        itinerary.items = updatedItems
+
+        val gson = Gson()
+        val updatedItineraryJson = gson.toJson(itinerary)
+        intent.putExtra("EXTRA_ITINERARY", updatedItineraryJson)
+
+        // Optional: Save updated itinerary to database if needed
+        val itineraryDao = AppDatabase.getDatabase(this).itineraryDao()
+        lifecycleScope.launch {
+            itineraryDao.update(itinerary) // Assuming you have an update method in your DAO
+        }
+    }
+
 
     private fun getDatesBetween(startDate: Date, endDate: Date, dateFormat: SimpleDateFormat): List<String> {
         val dates = mutableListOf<String>()
@@ -224,6 +257,7 @@ class EditItineraryActivity : AppCompatActivity() {
             updateTotalPrice()
         }
     }
+    
 
     //CODE SAVE EDIT ITINERARY
     private fun saveItinerary(itinerary: Itinerary) {

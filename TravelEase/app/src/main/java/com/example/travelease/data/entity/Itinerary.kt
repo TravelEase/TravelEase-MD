@@ -15,7 +15,7 @@ data class Itinerary(
     val endDate: String,
     val city: String,
     val totalPrice: Int,
-    val items: List<ListItem.RecommendationItem>,
+    var items: List<ListItem.RecommendationItem>,
     val kategori: List<String>,
     val numberOfPeople: Int
 )

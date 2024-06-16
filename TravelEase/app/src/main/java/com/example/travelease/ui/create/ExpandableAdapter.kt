@@ -137,3 +137,156 @@ class ExpandableAdapter(
         notifyDataSetChanged()
     }
 }
+
+
+//import android.text.Editable
+//import android.view.LayoutInflater
+//import android.view.ViewGroup
+//import androidx.recyclerview.widget.RecyclerView
+//import com.example.travelease.databinding.ExpandLayoutBinding
+//import com.example.travelease.databinding.ItemRecommendationBinding
+//
+//class ExpandableAdapter(
+//    private val items: MutableList<ListItem>,
+//    private val onDelete: (ListItem.RecommendationItem, String) -> Unit
+//) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+//
+//    private val expandedDates = mutableSetOf<String>()
+//    private val originalItems = items.toMutableList()
+//
+//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+//        return when (viewType) {
+//            VIEW_TYPE_DATE_HEADER -> DateHeaderViewHolder(
+//                ExpandLayoutBinding.inflate(
+//                    LayoutInflater.from(parent.context),
+//                    parent,
+//                    false
+//                )
+//            )
+//            VIEW_TYPE_RECOMMENDATION_ITEM -> RecommendationViewHolder(
+//                ItemRecommendationBinding.inflate(
+//                    LayoutInflater.from(parent.context),
+//                    parent,
+//                    false
+//                )
+//            )
+//            else -> throw IllegalArgumentException("Invalid view type")
+//        }
+//    }
+//
+//    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+//        when (val item = items[position]) {
+//            is ListItem.DateHeader -> {
+//                (holder as DateHeaderViewHolder).bind(item)
+//                holder.itemView.setOnClickListener {
+//                    if (expandedDates.contains(item.date)) {
+//                        collapseDate(item.date)
+//                    } else {
+//                        expandDate(item.date)
+//                    }
+//                }
+//            }
+//            is ListItem.RecommendationItem -> {
+//                (holder as RecommendationViewHolder).bind(item)
+//                holder.binding.ivDelete.setOnClickListener {
+//                    onDelete(item, item.date)
+////                    removeItem(item)
+//                }
+//            }
+//        }
+//    }
+//
+//    override fun getItemViewType(position: Int): Int {
+//        return when (items[position]) {
+//            is ListItem.DateHeader -> VIEW_TYPE_DATE_HEADER
+//            is ListItem.RecommendationItem -> VIEW_TYPE_RECOMMENDATION_ITEM
+//        }
+//    }
+//
+//    override fun getItemCount(): Int {
+//        return items.size
+//    }
+//
+//    private fun toggleDate(date: String) {
+//        if (expandedDates.contains(date)) {
+//            collapseDate(date)
+//        } else {
+//            expandDate(date)
+//        }
+//    }
+//
+//    private fun expandDate(date: String) {
+//        val index = items.indexOfFirst { it is ListItem.DateHeader && it.date == date }
+//        if (index != -1 && !expandedDates.contains(date)) {
+//            expandedDates.add(date)
+//            val sublist = originalItems.filter { it is ListItem.RecommendationItem && it.date == date }
+//            items.addAll(index + 1, sublist)
+//            notifyItemRangeInserted(index + 1, sublist.size)
+//        }
+//    }
+//
+//    private fun collapseDate(date: String) {
+//        val index = items.indexOfFirst { it is ListItem.DateHeader && it.date == date }
+//        if (index != -1 && expandedDates.contains(date)) {
+//            expandedDates.remove(date)
+//            val sublist = items.subList(index + 1, items.size).filter { it is ListItem.RecommendationItem && it.date == date }
+//            items.removeAll(sublist)
+//            notifyItemRangeRemoved(index + 1, sublist.size)
+//        }
+//    }
+//
+//    fun addItemToDate(newItem: ListItem.RecommendationItem, date: String) {
+//        val dateIndex = items.indexOfFirst { it is ListItem.DateHeader && it.date == date }
+//        if (dateIndex != -1) {
+//            if (!expandedDates.contains(date)) {
+//                expandDate(date) // Ensure the date is expanded when adding a new item
+//            }
+//            items.add(dateIndex + 1, newItem)
+//            originalItems.add(newItem)
+//            notifyItemInserted(dateIndex + 1)
+//        } else {
+//            // If the date header is not found, add new header and item
+//            val header = ListItem.DateHeader(date)
+//            items.add(header)
+//            items.add(newItem)
+//            originalItems.add(header)
+//            originalItems.add(newItem)
+//            notifyDataSetChanged() // Notify adapter of large data change
+//        }
+//    }
+//
+//    inner class DateHeaderViewHolder(private val binding: ExpandLayoutBinding) :
+//        RecyclerView.ViewHolder(binding.root) {
+//
+//        fun bind(item: ListItem.DateHeader) {
+//            binding.itemDate.text = item.date
+//        }
+//    }
+//
+//    inner class RecommendationViewHolder(val binding: ItemRecommendationBinding) :
+//        RecyclerView.ViewHolder(binding.root) {
+//
+//        fun bind(item: ListItem.RecommendationItem) {
+//            binding.ivItemPhoto.setImageResource(item.imageResId)
+//            binding.tvItemPlace.text = item.placeName
+//            binding.tvItemPrice.text = item.price
+//            binding.tfTime.text = Editable.Factory.getInstance().newEditable(item.timeMinutes)
+//        }
+//    }
+//
+//    fun removeItem(item: ListItem.RecommendationItem) {
+//        val position = items.indexOf(item)
+//        if (position != -1) {
+//            items.removeAt(position)
+//            notifyItemRemoved(position)
+//            // Notify the adapter of the changes in the dataset
+//            notifyDataSetChanged()
+//        }
+//
+//    }
+//
+//    companion object {
+//        private const val VIEW_TYPE_DATE_HEADER = 0
+//        private const val VIEW_TYPE_RECOMMENDATION_ITEM = 1
+//    }
+//}
