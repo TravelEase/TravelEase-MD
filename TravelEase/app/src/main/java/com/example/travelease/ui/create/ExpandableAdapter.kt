@@ -8,7 +8,8 @@ import com.example.travelease.databinding.ItemRecommendationBinding
 
 class ExpandableAdapter(
     private val items: MutableList<ListItem>,
-    private val onDeleteClick: (ListItem.RecommendationItem, String) -> Unit
+    private val onDeleteClick: (ListItem.RecommendationItem, String) -> Unit,
+    private val onItemClick: (ListItem.RecommendationItem) -> Unit // Add this line
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     // View type constants for headers and items
@@ -116,8 +117,12 @@ class ExpandableAdapter(
             binding.ivDelete.setOnClickListener {
                 onDeleteClick(item, item.date)
             }
+            binding.root.setOnClickListener {
+                onItemClick(item) // Handle item click
+            }
         }
     }
+
 
     // Method to remove an item from the list and update the adapter
     fun removeItem(item: ListItem.RecommendationItem) {
@@ -154,10 +159,11 @@ class ExpandableAdapter(
         }
     }
 
-
     fun updateItems(newItems: List<ListItem>) {
         items.clear()
         items.addAll(newItems)
         notifyDataSetChanged()
     }
+
+
 }

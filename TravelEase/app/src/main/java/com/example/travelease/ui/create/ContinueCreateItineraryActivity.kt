@@ -18,6 +18,7 @@ import com.example.travelease.data.response.AutoGenerateItineraryRequest
 import com.example.travelease.data.response.AutoGenerateItineraryResponse
 import com.example.travelease.data.room.AppDatabase
 import com.example.travelease.databinding.ActivityContinueCreateItineraryBinding
+import com.example.travelease.ui.detail.DetailDestinationActivity
 import com.example.travelease.ui.search.SearchResult
 import com.example.travelease.ui.search.SearchResultsAdapter
 import com.google.gson.Gson
@@ -250,9 +251,14 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
     }
 
     private fun setupRecommendationAdapter() {
-        val adapter = SimpleRecommendationAdapter(recommendationItems) { item ->
+        val adapter = SimpleRecommendationAdapter(recommendationItems, { item ->
             showDateSelectionDialog(item)
-        }
+        }, { item ->
+            val intent = Intent(this, DetailDestinationActivity::class.java)
+            intent.putExtra("PLACE_NAME", item.placeName)
+            intent.putExtra("CITY", binding.tvCity.text.toString())
+            startActivity(intent)
+        })
         binding.rvRecommendationItinerary.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.rvRecommendationItinerary.adapter = adapter
     }
@@ -362,9 +368,14 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        expandableAdapter = ExpandableAdapter(items) { item, date ->
+        expandableAdapter = ExpandableAdapter(items, { item, date ->
             showDeleteConfirmationDialog(item, date)
-        }
+        }, { item ->
+            val intent = Intent(this, DetailDestinationActivity::class.java)
+            intent.putExtra("PLACE_NAME", item.placeName)
+            intent.putExtra("CITY", binding.tvCity.text.toString())
+            startActivity(intent)
+        })
         binding.rvAutoItinerary.layoutManager = LinearLayoutManager(this)
         binding.rvAutoItinerary.adapter = expandableAdapter
 

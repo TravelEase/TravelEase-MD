@@ -7,15 +7,17 @@ import com.example.travelease.databinding.ItemAddBinding
 
 class SimpleRecommendationAdapter(
     private val items: List<SimpleRecommendationItem>,
-    private val onAddClick: (SimpleRecommendationItem) -> Unit
+    private val onAddClick: (SimpleRecommendationItem) -> Unit,
+    private val onItemClick: (SimpleRecommendationItem) -> Unit // Add this line
 ) : RecyclerView.Adapter<SimpleRecommendationAdapter.ViewHolder>() {
 
     class ViewHolder(private val binding: ItemAddBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: SimpleRecommendationItem, onAddClick: (SimpleRecommendationItem) -> Unit) {
+        fun bind(item: SimpleRecommendationItem, onAddClick: (SimpleRecommendationItem) -> Unit, onItemClick: (SimpleRecommendationItem) -> Unit) {
             binding.tvPlaceName.text = item.placeName
             binding.tvItemPrice.text = item.price
             binding.ivItemPhoto.setImageResource(item.imageResId)
             binding.btnAdd.setOnClickListener { onAddClick(item) }
+            binding.root.setOnClickListener { onItemClick(item) } // Add click listener
         }
     }
 
@@ -25,7 +27,7 @@ class SimpleRecommendationAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position], onAddClick)
+        holder.bind(items[position], onAddClick, onItemClick)
     }
 
     override fun getItemCount(): Int = items.size
