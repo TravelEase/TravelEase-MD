@@ -71,6 +71,7 @@ class SavedFragment : Fragment() {
 
             binding.rvSavedItinerary.layoutManager = LinearLayoutManager(requireContext())
             binding.rvSavedItinerary.adapter = savedItineraryAdapter
+            updateEmptyViewVisibility(itineraries.isEmpty())
         }
 
         val toolbar: Toolbar = binding.tbSaved
@@ -121,6 +122,16 @@ class SavedFragment : Fragment() {
         }
     }
 
+    private fun updateEmptyViewVisibility(isEmpty: Boolean) {
+        if (isEmpty) {
+            binding.rvSavedItinerary.visibility = View.GONE
+            binding.emptyView.visibility = View.VISIBLE
+        } else {
+            binding.rvSavedItinerary.visibility = View.VISIBLE
+            binding.emptyView.visibility = View.GONE
+        }
+    }
+
     private fun showDeleteAllConfirmationDialog() {
         AlertDialog.Builder(requireContext())
             .setTitle("Konfirmasi Hapus")
@@ -147,6 +158,7 @@ class SavedFragment : Fragment() {
                 binding.tbSaved.menu.clear()
                 binding.tbSaved.inflateMenu(R.menu.menu_delete_all)
                 binding.tbSaved.title = getString(R.string.saved_itineraries) // Ganti dengan judul toolbar default
+                updateEmptyViewVisibility(savedItineraryAdapter.itemCount == 0)
             }
         }
     }
@@ -158,6 +170,7 @@ class SavedFragment : Fragment() {
             withContext(Dispatchers.Main) {
                 savedItineraryAdapter.clearItems()
                 binding.tbSaved.title = getString(R.string.saved_itineraries) // Ganti dengan judul toolbar default
+                updateEmptyViewVisibility(true)
             }
         }
     }
