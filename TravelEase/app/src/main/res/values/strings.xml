@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">TravelEase</string>
-    <string name="title_activity_saved">SavedActivity</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
@@ -27,7 +26,9 @@
     <string name="saved">Saved Itinerary</string>
     <string name="create">Create Itinerary</string>
     <string name="profile">Profile</string>
-    <string name="title_fragment_saved">Saved Itinerary</string>
+    <string name="title_fragment_saved"> </string>
+    <string name="detail_destination">Detail Destination</string>
+    <string name="saved_itineraries">Saved Itinerary</string>
 
     <string-array name="city_names">
         <item>Jakarta</item>

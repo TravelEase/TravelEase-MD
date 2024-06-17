@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,113 +5,119 @@
     android:layout_height="match_parent"
     tools:context=".ui.create.ContinueCreateItineraryActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp"
-        android:orientation="vertical">
+        android:fillViewport="true">
 
         <LinearLayout
-            android:id="@+id/wadah1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <SearchView
-                android:id="@+id/search_bar"
-                android:layout_weight="1"
-                android:layout_marginRight="10dp"
-                android:background="@drawable/searchview_background"
-                android:layout_gravity="center_vertical"
+            android:padding="20dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/wadah1"
                 android:layout_width="match_parent"
-                android:layout_height="35dp" />
-            <Button
-                android:id="@+id/btn_add"
-                android:layout_width="75dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center_vertical"
-                android:text="Add"/>
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tv_tittle_rec"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="10dp"
-            android:textStyle="italic"
-            android:fontFamily="@font/open_sans_extrabold"
-            android:text="Recommendation Destinations"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_recommendation_itinerary"
-            android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:orientation="horizontal"
-            tools:listitem="@layout/item_add" />
-
-        <TextView
-            android:id="@+id/tv_tittle_auto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textStyle="italic"
-            android:fontFamily="@font/open_sans_extrabold"
-            android:layout_marginTop="10dp"
-            android:text="Auto Generate Itinerary"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:id="@+id/tv_category"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="12dp"
-                android:fontFamily="@font/open_sans"
-                android:text="Budaya, Baharii"/>
+                android:orientation="horizontal">
+                <SearchView
+                    android:id="@+id/search_bar"
+                    android:layout_weight="1"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/searchview_background"
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp" />
+                <Button
+                    android:id="@+id/btn_add"
+                    android:layout_width="75dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="Add"/>
+            </LinearLayout>
+
             <TextView
-                android:id="@+id/tv_city"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_tittle_rec"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="12dp"
-                android:fontFamily="@font/open_sans"
-                android:text="Yogya"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                android:layout_marginVertical="10dp"
+                android:textStyle="italic"
+                android:fontFamily="@font/open_sans_extrabold"
+                android:text="Recommendation Destinations"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_recommendation_itinerary"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:orientation="horizontal"
+                tools:listitem="@layout/item_add" />
+
             <TextView
-                android:id="@+id/tv_number_of_people"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="12dp"
-                android:fontFamily="@font/open_sans"
-                android:text="number of people: 1"/>
-            <TextView
-                android:id="@+id/tv_total_price"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_tittle_auto"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="italic"
-                android:textSize="12dp"
-                android:fontFamily="@font/open_sans_semibold"
-                android:text="Rp Total"/>
+                android:fontFamily="@font/open_sans_extrabold"
+                android:layout_marginTop="10dp"
+                android:text="Auto Generate Itinerary"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/tv_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12dp"
+                    android:fontFamily="@font/open_sans"
+                    android:text="Budaya, Baharii"/>
+                <TextView
+                    android:id="@+id/tv_city"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:fontFamily="@font/open_sans"
+                    android:text="Yogya"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/tv_number_of_people"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12dp"
+                    android:fontFamily="@font/open_sans"
+                    android:text="number of people: 1"/>
+                <TextView
+                    android:id="@+id/tv_total_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="italic"
+                    android:textSize="12dp"
+                    android:fontFamily="@font/open_sans_semibold"
+                    android:text="Rp Total"/>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_auto_itinerary"
+                android:layout_width="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_height="wrap_content"
+                tools:listitem="@layout/expand_layout" />
+
+            <Button
+                android:id="@+id/btn_save"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save"/>
         </LinearLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_auto_itinerary"
-            android:layout_width="match_parent"
-            android:layout_marginTop="10dp"
-            android:layout_height="370dp"
-            tools:listitem="@layout/expand_layout" />
-
-        <Button
-            android:id="@+id/btn_save"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Save"/>
-    </LinearLayout>
+    </ScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/searchResultsRecyclerView"

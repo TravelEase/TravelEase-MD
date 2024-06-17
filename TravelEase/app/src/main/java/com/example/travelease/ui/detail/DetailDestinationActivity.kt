@@ -66,7 +66,7 @@ class DetailDestinationActivity : AppCompatActivity() {
         binding.tvCity.text = result.city
         binding.tvPrice.text = "Rp ${result.price}"
         binding.tvDescription.text = result.description
-        binding.tvCategory.text = result.category
+        binding.tvCategory.text = "Category: ${result.category}"
         binding.ratingBar.rating = result.rating!!.toFloat()
         binding.tvRating.text = result.rating.toString()
 
@@ -74,7 +74,7 @@ class DetailDestinationActivity : AppCompatActivity() {
             .load(R.drawable.image_sample)
             .into(binding.ivMainImage)
 
-        binding.btnFindLocation.setOnClickListener {
+        binding.tvFindLocation.setOnClickListener {
             val coordinates = result.coordinate!!.replace("{", "").replace("}", "").replace("'", "").split(", ")
             val lat = coordinates[0].split(": ")[1].toDouble()
             val lng = coordinates[1].split(": ")[1].toDouble()
