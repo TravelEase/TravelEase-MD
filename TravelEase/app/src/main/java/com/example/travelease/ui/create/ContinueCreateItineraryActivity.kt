@@ -13,9 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.travelease.R
 import com.example.travelease.SavedActivity
 import com.example.travelease.data.entity.Itinerary
-import com.example.travelease.data.retrofit.ApiConfig
 import com.example.travelease.data.response.AutoGenerateItineraryRequest
 import com.example.travelease.data.response.AutoGenerateItineraryResponse
+import com.example.travelease.data.retrofit.ApiConfig
 import com.example.travelease.data.room.AppDatabase
 import com.example.travelease.databinding.ActivityContinueCreateItineraryBinding
 import com.example.travelease.ui.detail.DetailDestinationActivity
@@ -44,7 +44,9 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
     private lateinit var dates: String
     private var numberOfPeople: Int = 1
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+
+
+override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContinueCreateItineraryBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -345,7 +347,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
                                             price,
                                             date
                                         )
-                                    })
+                                    }.slice(0..4))
                                 }
 
                                 setupRecyclerView()
@@ -469,3 +471,4 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         }
     }
 }
+
