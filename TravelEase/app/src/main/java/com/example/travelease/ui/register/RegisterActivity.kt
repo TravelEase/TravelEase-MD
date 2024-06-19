@@ -57,7 +57,7 @@ class RegisterActivity : AppCompatActivity() {
                             usernameRef.setValue(user).addOnCompleteListener { innerTask ->
                                 if (innerTask.isSuccessful) {
                                     Toast.makeText(this, "Akun Berhasil Terdaftar", Toast.LENGTH_SHORT).show()
-                                    val intent = Intent(this, LoginActivity::class.java)
+                                    val intent = Intent(this, SavedActivity::class.java)
                                     startActivity(intent)
                                 } else {
                                     Log.e("RegisterActivity", "Error writing to database:", innerTask.exception)
