@@ -22,7 +22,6 @@ class LoginActivity : AppCompatActivity() {
 
         firebaseAuth = FirebaseAuth.getInstance()
 
-
         binding.registerText.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
@@ -40,12 +39,15 @@ class LoginActivity : AppCompatActivity() {
                 firebaseAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            // Start the main activity or any other activity after successful login
-                            val intent = Intent(this, SavedActivity::class.java)
-                            startActivity(intent)
-                            finish() // Close the login activity
+                            val user = firebaseAuth.currentUser
+                            user?.let {
+                                val uid = it.uid
+                                val intent = Intent(this, SavedActivity::class.java)
+                                intent.putExtra("USER_ID", uid) // Pass the UID
+                                startActivity(intent)
+                                finish()
+                            }
                         } else {
-                            // Handle login errors
                             Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                         }
                     }

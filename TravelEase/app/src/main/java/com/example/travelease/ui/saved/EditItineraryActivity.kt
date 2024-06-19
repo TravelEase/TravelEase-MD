@@ -25,6 +25,7 @@ import com.example.travelease.ui.create.SimpleRecommendationItem
 import com.example.travelease.ui.detail.DetailDestinationActivity
 import com.example.travelease.ui.search.SearchResult
 import com.example.travelease.ui.search.SearchResultsAdapter
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
@@ -41,18 +42,19 @@ class EditItineraryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditItineraryBinding
     private lateinit var expandableAdapter: ExpandableAdapter
-    private lateinit var recommendationAdapter: SimpleRecommendationAdapter
     private val items = mutableListOf<ListItem>()
     private val recommendationItems = mutableListOf<SimpleRecommendationItem>()
     private lateinit var itinerary: Itinerary
     private lateinit var searchResultsAdapter: SearchResultsAdapter
     private val searchResults = mutableListOf<SearchResult>()
+    private lateinit var userId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEditItineraryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
         val itineraryJson = intent.getStringExtra("EXTRA_ITINERARY")
         Log.d("EditItineraryActivity", "EXTRA_ITINERARY: $itineraryJson")
 
@@ -426,7 +428,8 @@ class EditItineraryActivity : AppCompatActivity() {
             items = items.filterIsInstance<ListItem.RecommendationItem>(),
             kategori = itinerary.kategori,
             numberOfPeople = itinerary.numberOfPeople,
-            imageUrl = itinerary.imageUrl
+            imageUrl = itinerary.imageUrl,
+            userId = userId
         )
 
         val gson = Gson()

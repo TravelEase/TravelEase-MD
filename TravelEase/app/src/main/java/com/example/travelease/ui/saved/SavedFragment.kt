@@ -14,6 +14,7 @@ import com.example.travelease.R
 import com.example.travelease.data.entity.Itinerary
 import com.example.travelease.data.room.AppDatabase
 import com.example.travelease.databinding.FragmentSavedBinding
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,12 +26,15 @@ class SavedFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var savedItineraryAdapter: SavedItineraryAdapter
     private var isSelectionMode = false
+    private lateinit var userId: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSavedBinding.inflate(inflater, container, false)
+        userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
         return binding.root
     }
 
@@ -39,7 +43,7 @@ class SavedFragment : Fragment() {
 
         val itineraryDao = AppDatabase.getDatabase(requireContext()).itineraryDao()
         lifecycleScope.launch {
-            val itineraries = itineraryDao.getAllItineraries().toMutableList()
+            val itineraries = itineraryDao.getAllItinerariesByUser(userId).toMutableList()
 
             savedItineraryAdapter = SavedItineraryAdapter(itineraries, object : SavedItineraryAdapter.OnClickListener {
                 override fun onClick(itinerary: Itinerary) {

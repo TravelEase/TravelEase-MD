@@ -21,6 +21,7 @@ import com.example.travelease.databinding.ActivityContinueCreateItineraryBinding
 import com.example.travelease.ui.detail.DetailDestinationActivity
 import com.example.travelease.ui.search.SearchResult
 import com.example.travelease.ui.search.SearchResultsAdapter
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
@@ -44,8 +45,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
     private lateinit var categories: List<String>
     private lateinit var dates: String
     private var numberOfPeople: Int = 1
-
-
+    private lateinit var userId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +65,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
 
         // Initialize itinerary
         initializeItinerary()
+        userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
         setupRecommendationRecyclerView()
         setupExpandableListView()
@@ -87,6 +88,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
     }
 
     private fun initializeItinerary() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         itinerary = Itinerary(
             startDate = "",
             endDate = "",
@@ -95,7 +97,8 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
             items = mutableListOf(),
             kategori = categories,
             numberOfPeople = numberOfPeople,
-            imageUrl = "" // Initialize with default value
+            imageUrl = "",
+            userId = userId
         )
     }
 
@@ -477,6 +480,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
 
                 // Define a default image URL or fetch it from your logic
                 val imageUrl = items.filterIsInstance<ListItem.RecommendationItem>().firstOrNull()?.imageUrl ?: "default_image_url"
+                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
                 val itinerary = Itinerary(
                     startDate = startDate,
@@ -486,7 +490,8 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
                     items = items.filterIsInstance<ListItem.RecommendationItem>(),
                     kategori = categories,
                     numberOfPeople = numberOfPeople,
-                    imageUrl = imageUrl // Add this line
+                    imageUrl = imageUrl,
+                    userId = userId
                 )
 
                 val gson = Gson()

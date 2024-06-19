@@ -18,5 +18,6 @@ data class Itinerary(
     var items: List<ListItem.RecommendationItem>,
     val kategori: List<String>,
     val numberOfPeople: Int,
-    val imageUrl: String
+    val imageUrl: String,
+    val userId: String
 )
