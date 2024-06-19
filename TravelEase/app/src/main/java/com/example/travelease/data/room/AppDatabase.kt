@@ -28,31 +28,10 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "itinerary_database"
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance
-            }
-        }
-
-        private val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("""
-                    CREATE TABLE IF NOT EXISTS `new_itinerary` (
-                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                        `startDate` TEXT NOT NULL,
-                        `endDate` TEXT NOT NULL,
-                        `city` TEXT NOT NULL,
-                        `totalPrice` INTEGER NOT NULL,
-                        `items` TEXT NOT NULL
-                    )
-                """)
-                database.execSQL("""
-                    INSERT INTO new_itinerary (id, startDate, endDate, city, totalPrice, items)
-                    SELECT id, startDate, endDate, city, totalPrice, '' FROM itinerary
-                """)
-                database.execSQL("DROP TABLE itinerary")
-                database.execSQL("ALTER TABLE new_itinerary RENAME TO itinerary")
             }
         }
     }

@@ -3,6 +3,8 @@ package com.example.travelease.ui.create
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.travelease.R
 import com.example.travelease.databinding.ExpandLayoutBinding
 import com.example.travelease.databinding.ItemRecommendationBinding
 
@@ -110,7 +112,6 @@ class ExpandableAdapter(
     // ViewHolder class for items
     inner class RecommendationViewHolder(private val binding: ItemRecommendationBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ListItem.RecommendationItem) {
-            binding.ivItemPhoto.setImageResource(item.imageResId)
             binding.tvItemPlace.text = item.placeName
             binding.tvItemPrice.text = item.price
             binding.tfTime.setText(item.timeMinutes)
@@ -120,6 +121,12 @@ class ExpandableAdapter(
             binding.root.setOnClickListener {
                 onItemClick(item) // Handle item click
             }
+
+            // Use Glide to load the image from the URL
+            Glide.with(binding.root.context)
+                .load(item.imageUrl)
+                .placeholder(R.drawable.image_sample) // Placeholder resource ID
+                .into(binding.ivItemPhoto)
         }
     }
 

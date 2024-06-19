@@ -10,7 +10,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.travelease.R
 import com.example.travelease.SavedActivity
 import com.example.travelease.data.entity.Itinerary
 import com.example.travelease.data.retrofit.ApiConfig
@@ -168,11 +167,12 @@ class EditItineraryActivity : AppCompatActivity() {
                     if (!results.isNullOrEmpty()) {
                         val result = results[0]
                         val newItem = ListItem.RecommendationItem(
-                            imageResId = R.drawable.image_sample,  // Use the default sample image
-                            timeMinutes = "N/A",  // Default value
-                            placeName = result.placeName.toString(),
-                            price = "Rp ${result.price}",
-                            date = date
+                            "N/A",
+                            result.placeName.toString(),
+                            "Rp ${result.price}",
+                            date,
+                            getStreetViewImageUrl(result.coordinate),
+                            result.coordinate.toString()
                         )
                         expandableAdapter.addItemToDate(newItem, date)
                         updateTotalPrice()
@@ -187,6 +187,13 @@ class EditItineraryActivity : AppCompatActivity() {
                 Toast.makeText(this@EditItineraryActivity, "Failed to fetch place details", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun getStreetViewImageUrl(coordinate: String?): String {
+        val coordinates = coordinate!!.replace("{", "").replace("}", "").replace("'", "").split(", ")
+        val lat = coordinates[0].split(": ")[1].toDouble()
+        val lng = coordinates[1].split(": ")[1].toDouble()
+        return "https://maps.googleapis.com/maps/api/streetview?size=400x400&location=$lat,$lng&fov=90&heading=235&pitch=10&key=AIzaSyCb4EmzUJ7ZT6-IOjMB9O3_JuZE9jauWBU"
     }
 
     //UNTUK DISPLAY ITINERARY
@@ -230,11 +237,13 @@ class EditItineraryActivity : AppCompatActivity() {
                     if (recommendations != null) {
                         val items = recommendations.mapNotNull { recommendation ->
                             val placeName = recommendation.placeName ?: return@mapNotNull null
-                            val price = recommendation.price?.let { "$ $it" } ?: return@mapNotNull null
+                            val price = recommendation.price?.let { "Rp $it" } ?: return@mapNotNull null
                             SimpleRecommendationItem(
-                                R.drawable.image_sample,
                                 placeName,
-                                price
+                                price,
+                                getStreetViewImageUrl(recommendation.coordinate),
+                                recommendation.coordinate.toString()
+
                             )
                         }
                         recommendationItems.clear()
@@ -245,18 +254,10 @@ class EditItineraryActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<List<AutoGenerateItineraryResponse>>, t: Throwable) {
-                // Handle the error
+                Log.e("EditItineraryActivity", "Error fetching recommendations", t)
             }
         })
     }
-
-//    private fun setupRecommendationAdapter() {
-//        recommendationAdapter = SimpleRecommendationAdapter(recommendationItems) { item ->
-//            showDateSelectionDialog(item)
-//        }
-//        binding.rvRecommendationItinerary.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-//        binding.rvRecommendationItinerary.adapter = recommendationAdapter
-//    }
 
     private fun setupRecommendationAdapter() {
         val adapter = SimpleRecommendationAdapter(recommendationItems, { item ->
@@ -386,11 +387,12 @@ class EditItineraryActivity : AppCompatActivity() {
 
     private fun addItemToItinerary(item: SimpleRecommendationItem, date: String) {
         val newItem = ListItem.RecommendationItem(
-            item.imageResId,
             "Isi waktu disini",
             item.placeName,
             item.price,
-            date
+            date,
+            item.imageUrl,
+            item.coordinate
         )
         val dateIndex = items.indexOfFirst { it is ListItem.DateHeader && it.date == date }
         if (dateIndex != -1) {
@@ -399,7 +401,6 @@ class EditItineraryActivity : AppCompatActivity() {
             updateTotalPrice()
         }
     }
-
 
     //CODE SAVE EDIT ITINERARY
     private fun saveItinerary(itinerary: Itinerary) {
@@ -416,7 +417,8 @@ class EditItineraryActivity : AppCompatActivity() {
             totalPrice = totalPrice,
             items = items.filterIsInstance<ListItem.RecommendationItem>(),
             kategori = itinerary.kategori,
-            numberOfPeople = itinerary.numberOfPeople
+            numberOfPeople = itinerary.numberOfPeople,
+            imageUrl = itinerary.imageUrl
         )
 
         val gson = Gson()

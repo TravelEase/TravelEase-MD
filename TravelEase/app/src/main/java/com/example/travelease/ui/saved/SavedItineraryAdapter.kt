@@ -3,12 +3,13 @@ package com.example.travelease.ui.saved
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.travelease.R
 import com.example.travelease.data.entity.Itinerary
 import com.example.travelease.databinding.ItemSavedBinding
 
 class SavedItineraryAdapter(
-    private val items: MutableList<Itinerary>, // Ubah menjadi MutableList
+    private val items: MutableList<Itinerary>,
     private val onClickListener: OnClickListener
 ) : RecyclerView.Adapter<SavedItineraryAdapter.SavedItineraryViewHolder>() {
 
@@ -33,7 +34,20 @@ class SavedItineraryAdapter(
             binding.tvItemDate.text = "${item.startDate} to ${item.endDate}"
             binding.tvItemPlace.text = item.city
             binding.tvItemPrice.text = item.totalPrice.toString()
-            binding.ivItemPhoto.setImageResource(R.drawable.image_sample)
+
+            // Get the coordinates from the first RecommendationItem
+            if (item.items.isNotEmpty()) {
+                val recommendationItem = item.items[0]
+                val coordinates = recommendationItem.coordinate.replace("{", "").replace("}", "").replace("'", "").split(", ")
+                val lat = coordinates[0].split(": ")[1].toDouble()
+                val lng = coordinates[1].split(": ")[1].toDouble()
+                val streetViewUrl = "https://maps.googleapis.com/maps/api/streetview?size=400x400&location=$lat,$lng&fov=90&heading=235&pitch=10&key=AIzaSyCb4EmzUJ7ZT6-IOjMB9O3_JuZE9jauWBU"
+
+                Glide.with(binding.ivItemPhoto.context)
+                    .load(streetViewUrl)
+                    .into(binding.ivItemPhoto)
+            }
+
             binding.root.isSelected = selectedItems.contains(position)
         }
     }

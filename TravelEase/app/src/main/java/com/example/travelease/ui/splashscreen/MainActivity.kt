@@ -4,11 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.travelease.R
 import com.example.travelease.databinding.ActivityMainBinding
 import com.example.travelease.ui.welcome.WelcomeActivity
 

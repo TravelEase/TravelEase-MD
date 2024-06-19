@@ -10,7 +10,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.travelease.R
 import com.example.travelease.SavedActivity
 import com.example.travelease.data.entity.Itinerary
 import com.example.travelease.data.response.AutoGenerateItineraryRequest
@@ -24,6 +23,7 @@ import com.example.travelease.ui.search.SearchResultsAdapter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,7 +46,7 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
 
 
 
-override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContinueCreateItineraryBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -87,13 +87,14 @@ override fun onCreate(savedInstanceState: Bundle?) {
 
     private fun initializeItinerary() {
         itinerary = Itinerary(
-            startDate = "",  // Initialize with default values
+            startDate = "",
             endDate = "",
             city = city,
             totalPrice = 0,
             items = mutableListOf(),
             kategori = categories,
-            numberOfPeople = numberOfPeople
+            numberOfPeople = numberOfPeople,
+            imageUrl = "" // Initialize with default value
         )
     }
 
@@ -190,12 +191,16 @@ override fun onCreate(savedInstanceState: Bundle?) {
                     val results = response.body()
                     if (!results.isNullOrEmpty()) {
                         val result = results[0]
+                        val coordinates = result.coordinate.toString()
+                        val imageUrl = getImageUrlFromCoordinates(coordinates)
+
                         val newItem = ListItem.RecommendationItem(
-                            imageResId = R.drawable.image_sample,  // Use the default sample image
-                            timeMinutes = "N/A",  // Default value
+                            timeMinutes = "N/A",  // Nilai default
                             placeName = result.placeName.toString(),
                             price = "Rp ${result.price}",
-                            date = date
+                            date = date,
+                            imageUrl = imageUrl, // Simpan URL gambar
+                            coordinate = coordinates
                         )
                         expandableAdapter.addItemToDate(newItem, date)
                         updateTotalPrice()
@@ -210,6 +215,23 @@ override fun onCreate(savedInstanceState: Bundle?) {
                 Toast.makeText(this@ContinueCreateItineraryActivity, "Failed to fetch place details", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun getImageUrlFromCoordinates(coordinates: String): String {
+        val json = JSONObject(coordinates)
+        val lat = json.getDouble("lat")
+        val lng = json.getDouble("lng")
+        return "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=$lat,$lng&key=AIzaSyCb4EmzUJ7ZT6-IOjMB9O3_JuZE9jauWBU"
+    }
+
+    private fun getStreetViewImageUrl(coordinate: String?): String {
+        if (coordinate.isNullOrEmpty()) {
+            return "https://via.placeholder.com/600x300" // Placeholder image URL
+        }
+        val json = JSONObject(coordinate)
+        val lat = json.getDouble("lat")
+        val lng = json.getDouble("lng")
+        return "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=$lat,$lng&key=AIzaSyCb4EmzUJ7ZT6-IOjMB9O3_JuZE9jauWBU"
     }
 
     //CODE UNTUK CARD RECOMMENDATION
@@ -230,11 +252,14 @@ override fun onCreate(savedInstanceState: Bundle?) {
                             val items = recommendations.mapNotNull { recommendation ->
                                 val placeName = recommendation.placeName ?: return@mapNotNull null
                                 val price = recommendation.price?.let { "Rp $it" } ?: return@mapNotNull null
-                                SimpleRecommendationItem(
-                                    R.drawable.image_sample,
-                                    placeName,
-                                    price
-                                )
+                                recommendation.coordinate?.let {
+                                    SimpleRecommendationItem(
+                                        placeName,
+                                        price,
+                                        getStreetViewImageUrl(recommendation.coordinate),
+                                        it // Add this line
+                                    )
+                                }
                             }
                             recommendationItems.clear()
                             recommendationItems.addAll(items)
@@ -290,11 +315,12 @@ override fun onCreate(savedInstanceState: Bundle?) {
 
     private fun addItemToItinerary(item: SimpleRecommendationItem, date: String) {
         val newItem = ListItem.RecommendationItem(
-            item.imageResId,
             "Isi waktu disini",
             item.placeName,
             item.price,
-            date
+            date,
+            item.imageUrl,
+            item.coordinate
         )
         val dateIndex = items.indexOfFirst { it is ListItem.DateHeader && it.date == date }
         if (dateIndex != -1) {
@@ -303,7 +329,6 @@ override fun onCreate(savedInstanceState: Bundle?) {
             updateTotalPrice()
         }
     }
-
     //CODE UNTUK AUTO GENERATE ITINERARY
     private fun setupExpandableListView() {
         if (dates.isNotEmpty() && city.isNotEmpty()) {
@@ -340,13 +365,16 @@ override fun onCreate(savedInstanceState: Bundle?) {
                                         val placeName = recommendation.placeName ?: return@mapNotNull null
                                         val timeMinutes = recommendation.timeMinutes?.let { "${it.toInt()} minutes" } ?: return@mapNotNull null
                                         val price = recommendation.price?.let { "Rp $it" } ?: return@mapNotNull null
-                                        ListItem.RecommendationItem(
-                                            R.drawable.image_sample,
-                                            timeMinutes,
-                                            placeName,
-                                            price,
-                                            date
-                                        )
+                                        recommendation.coordinate?.let {
+                                            ListItem.RecommendationItem(
+                                                timeMinutes,
+                                                placeName,
+                                                price,
+                                                date,
+                                                getStreetViewImageUrl(recommendation.coordinate),
+                                                it
+                                            )
+                                        }
                                     }.slice(0..4))
                                 }
 
@@ -443,6 +471,10 @@ override fun onCreate(savedInstanceState: Bundle?) {
                 val endDate = dateList[1]
 
                 val totalPrice = calculateTotalPrice(items)
+
+                // Define a default image URL or fetch it from your logic
+                val imageUrl = items.filterIsInstance<ListItem.RecommendationItem>().firstOrNull()?.imageUrl ?: "default_image_url"
+
                 val itinerary = Itinerary(
                     startDate = startDate,
                     endDate = endDate,
@@ -450,7 +482,8 @@ override fun onCreate(savedInstanceState: Bundle?) {
                     totalPrice = totalPrice,
                     items = items.filterIsInstance<ListItem.RecommendationItem>(),
                     kategori = categories,
-                    numberOfPeople = numberOfPeople
+                    numberOfPeople = numberOfPeople,
+                    imageUrl = imageUrl // Add this line
                 )
 
                 val gson = Gson()
@@ -470,5 +503,6 @@ override fun onCreate(savedInstanceState: Bundle?) {
             }
         }
     }
+
 }
 

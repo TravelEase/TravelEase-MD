@@ -67,11 +67,17 @@ class DetailDestinationActivity : AppCompatActivity() {
         binding.tvPrice.text = "Rp ${result.price}"
         binding.tvDescription.text = result.description
         binding.tvCategory.text = "Category: ${result.category}"
-        binding.ratingBar.rating = result.rating!!.toFloat()
+        binding.ratingBar.rating = result.rating?.toFloat() ?: 0.0f
         binding.tvRating.text = result.rating.toString()
 
+        // Mengubah bagian ini untuk memuat gambar dari Street View
+        val coordinates = result.coordinate?.replace("{", "")?.replace("}", "")?.replace("'", "")
+        val lat = coordinates?.split(", ")?.get(0)?.split(": ")?.get(1)?.toDouble() ?: 0.0
+        val lng = coordinates?.split(", ")?.get(1)?.split(": ")?.get(1)?.toDouble() ?: 0.0
+        val streetViewUrl = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=$lat,$lng&fov=90&heading=235&pitch=10&key=AIzaSyCb4EmzUJ7ZT6-IOjMB9O3_JuZE9jauWBU"
+
         Glide.with(this)
-            .load(R.drawable.image_sample)
+            .load(streetViewUrl)
             .into(binding.ivMainImage)
 
         binding.tvFindLocation.setOnClickListener {
