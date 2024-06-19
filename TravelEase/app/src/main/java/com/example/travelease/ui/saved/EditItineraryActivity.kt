@@ -12,23 +12,29 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.travelease.SavedActivity
 import com.example.travelease.data.entity.Itinerary
-import com.example.travelease.data.retrofit.ApiConfig
 import com.example.travelease.data.response.AutoGenerateItineraryRequest
 import com.example.travelease.data.response.AutoGenerateItineraryResponse
+import com.example.travelease.data.retrofit.ApiConfig
 import com.example.travelease.data.room.AppDatabase
 import com.example.travelease.databinding.ActivityEditItineraryBinding
-import com.example.travelease.ui.create.*
+import com.example.travelease.ui.create.ExpandableAdapter
+import com.example.travelease.ui.create.ListItem
+import com.example.travelease.ui.create.SimpleRecommendationAdapter
+import com.example.travelease.ui.create.SimpleRecommendationItem
 import com.example.travelease.ui.detail.DetailDestinationActivity
 import com.example.travelease.ui.search.SearchResult
 import com.example.travelease.ui.search.SearchResultsAdapter
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
-import java.util.*
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+
 
 class EditItineraryActivity : AppCompatActivity() {
 

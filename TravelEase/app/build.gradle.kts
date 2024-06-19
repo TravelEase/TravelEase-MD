@@ -83,4 +83,5 @@ dependencies {
     implementation ("com.google.firebase:firebase-database:20.0.3")
     // Add the dependency for the Firebase SDK for Google Analytics
     implementation("com.google.firebase:firebase-analytics")
+
 }
