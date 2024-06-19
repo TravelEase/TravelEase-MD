@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.travelease.BuildConfig
 import com.example.travelease.R
 import com.example.travelease.data.entity.Itinerary
 import com.example.travelease.databinding.ItemSavedBinding
@@ -41,7 +42,8 @@ class SavedItineraryAdapter(
                 val coordinates = recommendationItem.coordinate.replace("{", "").replace("}", "").replace("'", "").split(", ")
                 val lat = coordinates[0].split(": ")[1].toDouble()
                 val lng = coordinates[1].split(": ")[1].toDouble()
-                val streetViewUrl = "https://maps.googleapis.com/maps/api/streetview?size=400x400&location=$lat,$lng&fov=90&heading=235&pitch=10&key=AIzaSyCb4EmzUJ7ZT6-IOjMB9O3_JuZE9jauWBU"
+                val apiKey = BuildConfig.GOOGLE_MAPS_API_KEY
+                val streetViewUrl = "https://maps.googleapis.com/maps/api/streetview?size=400x400&location=$lat,$lng&fov=90&heading=235&pitch=10&key=$apiKey"
 
                 Glide.with(binding.ivItemPhoto.context)
                     .load(streetViewUrl)

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.travelease.BuildConfig
 import com.example.travelease.SavedActivity
 import com.example.travelease.data.entity.Itinerary
 import com.example.travelease.data.response.AutoGenerateItineraryRequest
@@ -221,7 +222,8 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         val json = JSONObject(coordinates)
         val lat = json.getDouble("lat")
         val lng = json.getDouble("lng")
-        return "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=$lat,$lng&key=AIzaSyCb4EmzUJ7ZT6-IOjMB9O3_JuZE9jauWBU"
+        val apiKey = BuildConfig.GOOGLE_MAPS_API_KEY
+        return "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=$lat,$lng&key=$apiKey"
     }
 
     private fun getStreetViewImageUrl(coordinate: String?): String {
@@ -231,7 +233,8 @@ class ContinueCreateItineraryActivity : AppCompatActivity() {
         val json = JSONObject(coordinate)
         val lat = json.getDouble("lat")
         val lng = json.getDouble("lng")
-        return "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=$lat,$lng&key=AIzaSyCb4EmzUJ7ZT6-IOjMB9O3_JuZE9jauWBU"
+        val apiKey = BuildConfig.GOOGLE_MAPS_API_KEY
+        return "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=$lat,$lng&key=$apiKey"
     }
 
     //CODE UNTUK CARD RECOMMENDATION

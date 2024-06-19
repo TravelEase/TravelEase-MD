@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.travelease.BuildConfig
 import com.example.travelease.SavedActivity
 import com.example.travelease.data.entity.Itinerary
 import com.example.travelease.data.response.AutoGenerateItineraryRequest
@@ -199,7 +200,8 @@ class EditItineraryActivity : AppCompatActivity() {
         val coordinates = coordinate!!.replace("{", "").replace("}", "").replace("'", "").split(", ")
         val lat = coordinates[0].split(": ")[1].toDouble()
         val lng = coordinates[1].split(": ")[1].toDouble()
-        return "https://maps.googleapis.com/maps/api/streetview?size=400x400&location=$lat,$lng&fov=90&heading=235&pitch=10&key=AIzaSyCb4EmzUJ7ZT6-IOjMB9O3_JuZE9jauWBU"
+        val apiKey = BuildConfig.GOOGLE_MAPS_API_KEY
+        return "https://maps.googleapis.com/maps/api/streetview?size=400x400&location=$lat,$lng&fov=90&heading=235&pitch=10&key=$apiKey"
     }
 
     //UNTUK DISPLAY ITINERARY

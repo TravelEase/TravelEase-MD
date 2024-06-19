@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.example.travelease.BuildConfig
 import com.example.travelease.R
 import com.example.travelease.data.retrofit.ApiConfig
 import com.example.travelease.data.response.AutoGenerateItineraryResponse
@@ -74,7 +75,8 @@ class DetailDestinationActivity : AppCompatActivity() {
         val coordinates = result.coordinate?.replace("{", "")?.replace("}", "")?.replace("'", "")
         val lat = coordinates?.split(", ")?.get(0)?.split(": ")?.get(1)?.toDouble() ?: 0.0
         val lng = coordinates?.split(", ")?.get(1)?.split(": ")?.get(1)?.toDouble() ?: 0.0
-        val streetViewUrl = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=$lat,$lng&fov=90&heading=235&pitch=10&key=AIzaSyCb4EmzUJ7ZT6-IOjMB9O3_JuZE9jauWBU"
+        val apiKey = BuildConfig.GOOGLE_MAPS_API_KEY
+        val streetViewUrl = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=$lat,$lng&fov=90&heading=235&pitch=10&key=$apiKey"
 
         Glide.with(this)
             .load(streetViewUrl)
