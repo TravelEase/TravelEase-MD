@@ -7,4 +7,30 @@
     <color name="purplemuda">#B6A0FF</color>
     <color name="default_button_color">#7351E7</color>
     <color name="selected_button_color">#B6A0FF</color>
+
+    <!-- Light Theme Colors -->
+    <color name="my_light_primary">#7351E7</color>
+    <color name="my_light_primary_variant">#B6A0FF</color>
+    <color name="my_light_on_primary">#FFFFFF</color>
+    <color name="my_light_secondary">#5E35A8</color>
+    <color name="my_light_secondary_variant">#018786</color>
+    <color name="my_light_on_secondary">#000000</color>
+    <color name="my_light_background">#FFFFFF</color>
+    <color name="my_light_surface">#FFFFFF</color>
+    <color name="my_light_on_surface">#000000</color>
+    <color name="my_light_error">#B00020</color>
+    <color name="my_light_on_error">#FFFFFF</color>
+
+    <!-- Dark Theme Colors -->
+    <color name="my_dark_primary">#4C349E</color>
+    <color name="my_dark_primary_variant">#7351E7</color>
+    <color name="my_dark_on_primary">#000000</color>
+    <color name="my_dark_secondary">#673AB7</color>
+    <color name="my_dark_secondary_variant">#03DAC6</color>
+    <color name="my_dark_on_secondary">#000000</color>
+    <color name="my_dark_background">#121212</color>
+    <color name="my_dark_surface">#121212</color>
+    <color name="my_dark_on_surface">#FFFFFF</color>
+    <color name="my_dark_error">#CF6679</color>
+    <color name="my_dark_on_error">#000000</color>
 </resources>

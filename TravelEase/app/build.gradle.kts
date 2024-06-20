@@ -58,8 +58,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    //DataStore
-    implementation ("androidx.datastore:datastore-preferences:1.1.1")
     //circle image
     implementation ("de.hdodenhof:circleimageview:3.1.0")
     //retrofit
